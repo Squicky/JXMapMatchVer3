@@ -2,20 +2,16 @@ package jxmapmatch;
 
 import interfaces.JXMapMatchGUIInterface;
 import interfaces.StatusUpdate;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.EventListener;
 import java.util.Hashtable;
-
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.ChangeListener;
-
 import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
-
 import tools.Tools;
 import dialogelements.JPanelBoxLayout;
 import static algorithm.NRouteAlgorithm.*;
@@ -74,6 +70,8 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 	//private JCheckBox jCheckBoxSelectedRoute;
 	private JCheckBox jCheckBoxProjectNMatch;
 	private JCheckBox jCheckBoxReorderNMatch;
+	
+	private JCheckBox jCheckBoxKMLNorm;
 	
 	private JCheckBox jCheckBoxNRouteNormalizeMatchedGPSTimeStamp_2;
 	private JCheckBox jCheckBoxNormalizeGPSTimeStamp;
@@ -461,6 +459,10 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		jCheckBoxProjectNMatch = new JCheckBox("Project");
 		jCheckBoxProjectNMatch.setAlignmentX(CENTER_ALIGNMENT);
 
+		jCheckBoxKMLNorm = new JCheckBox("KML Norm");
+		this.setKMLNorm(true);
+		jCheckBoxKMLNorm.setAlignmentX(CENTER_ALIGNMENT);
+
 		// create JButtons
 		jButtonNRouteRoute = new JButton("Route");
 		jButtonNRouteRoute.setActionCommand("change N route algorithm state");
@@ -486,11 +488,16 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		Box horBox2 = Box.createHorizontalBox();
 		Box horBox3 = Box.createHorizontalBox();
 		//Box horBox4 = Box.createHorizontalBox();
+		Box horBox5 = Box.createHorizontalBox();
+		
 		horBox1.add(jButtonNRouteRoute);
 		horBox2.add(jButtonNRouteMatch);
 		//horBox2.add(jButtonNRouteOpen);
 		horBox3.add(jButtonNRouteExport);
 		//horBox3.add(jButtonNRouteSave);
+		
+		horBox5.add(jCheckBoxKMLNorm);
+		
 		//horBox4.add(jButtonNRouteReset);
 
 		// add to panel
@@ -504,10 +511,13 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		// jPanelNRoute.add(jSpinnerNRouteThreshold);
 		//jPanelNRoute.add(jCheckBoxReorderNMatch);
 		//jPanelNRoute.add(jCheckBoxProjectNMatch);
+		
 		jPanelNRoute.add(horBox1);
 		jPanelNRoute.add(horBox2);
 		jPanelNRoute.add(horBox3);
 		//jPanelNRoute.add(horBox4);
+		jPanelNRoute.add(horBox5);
+		
 		// jPanelNRoute.add(jCheckBoxNRouteNormalizeMatchedGPSTimeStamp_2);
 
 		// add panel to container
@@ -767,6 +777,8 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		jButtonNRouteExport.setEnabled(enableExport);
 		jCheckBoxNRouteNormalizeMatchedGPSTimeStamp_2.setEnabled(enableExport);
 		//jButtonNRouteReset.setEnabled(enableReset);
+		
+		jCheckBoxKMLNorm.setEnabled(enableExport);
 
 		// get caption of match button according to current match GPS/n route
 		// algorithm states
@@ -1229,6 +1241,17 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		return jCheckBoxReorderNMatch.isSelected();
 	}
 
+	@Override
+	public void setKMLNorm(boolean enable) {
+		jCheckBoxKMLNorm.setSelected(enable);
+	}
+
+	@Override
+	public boolean getKMLNorm() {
+		return jCheckBoxKMLNorm.isSelected();
+	}
+
+	
 	@Override
 	public void setProjectNMatch(boolean enable) {
 		jCheckBoxProjectNMatch.setSelected(enable);

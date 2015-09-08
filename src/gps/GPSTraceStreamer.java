@@ -43,9 +43,6 @@ import java.util.*;
  *         exports matched GPS traces/Points to text based files
  */
 
-// TODO: improve moment where progress calculation is shown (for GPX)
-// TODO: bugfix normalized timestamp
-
 public class GPSTraceStreamer {
 
 	// pattern for GPS point: timestamp, latitude, longitude ->
@@ -62,6 +59,21 @@ public class GPSTraceStreamer {
 														// 1.Year 2.Month 3.Day
 														// 4.Time(HH:MM:ss)
 
+	static private final double MIN_DATARATE_DOWN = 0;
+	static private final double MAX_DATARATE_DOWN = 7200000 / 8;
+	static private final double MIN_DELAY_DOWN = 0;
+	static private final double MAX_DELAY_DOWN = 0.5;
+	static private final double MIN_LOSS_RATE_DOWN = 0;
+	static private final double MAX_LOSS_RATE_DOWN = 100;
+
+	static private final double MIN_DATARATE_UP = 0;
+	static private final double MAX_DATARATE_UP = 4000000 / 8;
+	static private final double MIN_DELAY_UP = 0;
+	static private final double MAX_DELAY_UP = 0.5;
+	static private final double MIN_LOSS_RATE_UP = 0;
+	static private final double MAX_LOSS_RATE_UP = 100;
+
+	
 	// create date formatter for parsing date string
 	static private DateFormat dateFormatter = DateFormat.getDateTimeInstance();
 
@@ -1104,61 +1116,66 @@ public class GPSTraceStreamer {
 		}
 	}
 
-	private static void createKmlDatasetsDatarateColor(Vector<myDataset> DatasetsDown, String filePath) {
+	private static void createKmlDatasetsDatarateColor(Vector<myDataset> DatasetsDown, String filePath, boolean kmlNorm, double _minData, double _maxData) {
 		filePath = filePath + ".ColorDatarate.kml";
-		createKmlDatasetsDataColor(DatasetsDown, filePath, "datarate");
+		createKmlDatasetsDataColor(DatasetsDown, filePath, "datarate", kmlNorm, _minData, _maxData);
 	}
 	
-	private static void createKmlDatasetsDelayColor(Vector<myDataset> DatasetsDown, String filePath) {
+	private static void createKmlDatasetsDelayColor(Vector<myDataset> DatasetsDown, String filePath, boolean kmlNorm, double _minData, double _maxData) {
 		filePath = filePath + ".ColorDelay.kml";
-		createKmlDatasetsDataColor(DatasetsDown, filePath, "delay");
+		createKmlDatasetsDataColor(DatasetsDown, filePath, "delay", kmlNorm, _minData, _maxData);
 	}
 	
-	private static void createKmlDatasetsLossRateColor(Vector<myDataset> DatasetsDown, String filePath) {
+	private static void createKmlDatasetsLossRateColor(Vector<myDataset> DatasetsDown, String filePath, boolean kmlNorm, double _minData, double _maxData) {
 		filePath = filePath + ".ColorLoss_rate.kml";
-		createKmlDatasetsDataColor(DatasetsDown, filePath, "loss_rate");
+		createKmlDatasetsDataColor(DatasetsDown, filePath, "loss_rate", kmlNorm, _minData, _maxData);
 	}
-	
-	private static void createKmlDatasetsDataColor(Vector<myDataset> Datasets, String filePath, String dataType)  {
+
+	private static void createKmlDatasetsDataColor(Vector<myDataset> Datasets, String filePath, String dataType, boolean kmlNorm, double _minData, double _maxData)  {
 		try {
-			
 			double minData = Double.MAX_VALUE;
 			double maxData = -Double.MAX_VALUE;
 			
-			if (dataType.equals("datarate")) {
-				for (myDataset ds : Datasets) {
-					if (ds.isMatched && ds.datarate != -1) {
-						if (ds.datarate < minData) {
-							minData = ds.datarate;
-						}
-						if (maxData < ds.datarate) {
-							maxData = ds.datarate;
+			if (kmlNorm) {
+				if (dataType.equals("datarate")) {
+					for (myDataset ds : Datasets) {
+						if (ds.isMatched && ds.datarate != -1) {
+							if (ds.datarate < minData) {
+								minData = ds.datarate;
+							}
+							if (maxData < ds.datarate) {
+								maxData = ds.datarate;
+							}
 						}
 					}
-				}
-			} else if (dataType.equals("delay")) {
-				for (myDataset ds : Datasets) {
-					if (ds.isMatched && ds.delay != -1) {
-						if (ds.delay < minData) {
-							minData = ds.delay;
+				} else if (dataType.equals("delay")) {
+					for (myDataset ds : Datasets) {
+						if (ds.isMatched && ds.delay != -1) {
+							if (ds.delay < minData) {
+								minData = ds.delay;
+							}
+							if (maxData < ds.delay) {
+								maxData = ds.delay;
+							}
 						}
-						if (maxData < ds.delay) {
-							maxData = ds.delay;
+					}
+				} else {
+					for (myDataset ds : Datasets) {
+						if (ds.isMatched && ds.loss_rate != -1) {
+							if (ds.loss_rate < minData) {
+								minData = ds.loss_rate;
+							}
+							if (maxData < ds.loss_rate) {
+								maxData = ds.loss_rate;
+							}
 						}
 					}
 				}
 			} else {
-				for (myDataset ds : Datasets) {
-					if (ds.isMatched && ds.loss_rate != -1) {
-						if (ds.loss_rate < minData) {
-							minData = ds.loss_rate;
-						}
-						if (maxData < ds.loss_rate) {
-							maxData = ds.loss_rate;
-						}						
-					}
-				}
+				minData = _minData;
+				maxData = _maxData;
 			}
+
 			
 			double devData = maxData - minData;
 			
@@ -1211,11 +1228,35 @@ public class GPSTraceStreamer {
 					double f;
 					
 					if (dataType.equals("datarate")) {
-						f = ds1.datarate - minData;
+						if (kmlNorm) {
+							f = ds1.datarate - minData;
+						} else if (ds1.datarate < minData) {
+							f = minData;
+						} else if (maxData < ds1.datarate) {
+							f = maxData;
+						} else {
+							f = ds1.datarate - minData;
+						}
 					} else if (dataType.equals("delay")) {
-						f = ds1.delay - minData;
+						if (kmlNorm) {
+							f = ds1.delay - minData;
+						} else if (ds1.delay < minData) {
+							f = minData;
+						} else if (maxData < ds1.delay) {
+							f = maxData;
+						} else {
+							f = ds1.delay - minData;
+						}
 					} else {
-						f = ds1.loss_rate - minData;
+						if (kmlNorm) {
+							f = ds1.loss_rate - minData;
+						} else if (ds1.loss_rate < minData) {
+							f = minData;
+						} else if (maxData < ds1.loss_rate) {
+							f = maxData;
+						} else {
+							f = ds1.loss_rate - minData;
+						}
 					}
 					
 					f = f / devData;
@@ -1280,7 +1321,7 @@ public class GPSTraceStreamer {
 	                
 					bKmlWriterDatasetsUp.write("		<Placemark>" + System.lineSeparator());
 					bKmlWriterDatasetsUp.write("			<name>" + ds1.getTimestamp() + "</name>" + System.lineSeparator());
-					bKmlWriterDatasetsUp.write("			<description>" + ds1.getTimestamp() + System.lineSeparator() +
+					bKmlWriterDatasetsUp.write("			<description>" +
 					"datarate: " + ds1.datarate + System.lineSeparator() + 
 					"delay: " + ds1.delay + System.lineSeparator() + 
 					"loss rate: " + ds1.loss_rate + "</description>" + System.lineSeparator());
@@ -2106,7 +2147,7 @@ public class GPSTraceStreamer {
 	 * @return was writing progress successful?
 	 */
 	public static boolean saveMatchedGPSTraceToFile(myOSMMap myMap, Vector<MatchedGPSNode> gpsNodesToMatch, long refTimeStamp,
-			boolean normalizeTimeStamp, String filePath, StatusUpdate statusUpdate, Vector<MatchedNLink> matchedNLinks) {
+			boolean normalizeTimeStamp, String filePath, StatusUpdate statusUpdate, Vector<MatchedNLink> matchedNLinks, boolean kmlNorm) {
 
 		MatchedNLink.reorderMatchedGPSNodes(matchedNLinks, gpsNodesToMatch);
 
@@ -2131,16 +2172,14 @@ public class GPSTraceStreamer {
 		GPSTraceStreamer.createKmlDatasetsDown(myMap.DatasetsDown, filePath);
 		GPSTraceStreamer.createKmlDatasetsUpUnMatched(myMap.DatasetsUp, filePath);
 		GPSTraceStreamer.createKmlDatasetsDownUnMatched(myMap.DatasetsDown, filePath);
+
+		GPSTraceStreamer.createKmlDatasetsDatarateColor(myMap.DatasetsDown, filePath + ".Down", kmlNorm, MIN_DATARATE_DOWN, MAX_DATARATE_DOWN);
+		GPSTraceStreamer.createKmlDatasetsDelayColor(myMap.DatasetsDown, filePath + ".Down", kmlNorm, MIN_DELAY_DOWN, MAX_DELAY_DOWN);
+		GPSTraceStreamer.createKmlDatasetsLossRateColor(myMap.DatasetsDown, filePath + ".Down", kmlNorm, MIN_LOSS_RATE_DOWN, MAX_LOSS_RATE_DOWN);
 		
-		GPSTraceStreamer.createKmlDatasetsDatarateColor(myMap.DatasetsDown, filePath + ".Down");
-		GPSTraceStreamer.createKmlDatasetsDelayColor(myMap.DatasetsDown, filePath + ".Down");
-		GPSTraceStreamer.createKmlDatasetsLossRateColor(myMap.DatasetsDown, filePath + ".Down");
-		
-		GPSTraceStreamer.createKmlDatasetsDatarateColor(myMap.DatasetsUp, filePath + ".Up");
-		GPSTraceStreamer.createKmlDatasetsDelayColor(myMap.DatasetsUp, filePath + ".Up");
-		GPSTraceStreamer.createKmlDatasetsLossRateColor(myMap.DatasetsUp, filePath + ".Up");
-		
-		
+		GPSTraceStreamer.createKmlDatasetsDatarateColor(myMap.DatasetsUp, filePath + ".Up", kmlNorm, MIN_DATARATE_UP, MAX_DATARATE_UP);
+		GPSTraceStreamer.createKmlDatasetsDelayColor(myMap.DatasetsUp, filePath + ".Up", kmlNorm, MIN_DELAY_UP, MAX_DELAY_UP);
+		GPSTraceStreamer.createKmlDatasetsLossRateColor(myMap.DatasetsUp, filePath + ".Up", kmlNorm, MIN_LOSS_RATE_UP, MAX_LOSS_RATE_UP);
 		
 		GPSTraceStreamer.createKmlDatasetsUnMatchedRouteDistribution(myMap.DatasetsDown, filePath + ".RouteDistribution.kml", "FF888888");
 

@@ -7,7 +7,6 @@ import graphic.JXMapPainter;
 import interfaces.JXMapMatchGUIInterface;
 import interfaces.MatchingGPSObject;
 import interfaces.StatusUpdate;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
@@ -22,31 +21,21 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
-//import java.io.IOException;
-//import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutionException;
-
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import logging.Logger;
 import myOSM.myOSMMap;
-
 import org.jdesktop.swingx.JXMapKit;
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.painter.Painter;
-
 import algorithm.GPSToLinkMatcher;
 import algorithm.MatchGPStoNRouteAlgorithm;
 import algorithm.NRouteAlgorithm;
-//import route.NRouteStreamer;
-//import route.NRouteStreamer.MapFileNotFoundException;
-//import route.NRouteStreamer.NRouteFileNotFoundException;
-//import route.NRouteStreamer.SHA256CheckSumException;
 import route.SelectedNRoute;
 import dialogelements.JFileDialog;
 import static algorithm.NRouteAlgorithm.*;
@@ -132,7 +121,7 @@ public class JXMapMatchController implements ActionListener,
 	public static Color MULTI_SELECTABLE_LINK_COLOR = Color.GREEN;
 	public static Color SELECTED_LINK_COLOR = Color.ORANGE;
 	public static Color NON_MATCHED_LINK_COLOR = Color.LIGHT_GRAY;
-	public static Color N_ROUTE_LINK_COLOR = Color.ORANGE; //new Color(0, 0, 255);
+	public static Color N_ROUTE_LINK_COLOR = new Color(0, 0, 255);
 	
 	public static Color SELECTABLE_N_ROUTE_COLOR = Color.GREEN;
 	public static Color DELETABLE_N_ROUTE_COLOR = Color.ORANGE;
@@ -319,7 +308,7 @@ public class JXMapMatchController implements ActionListener,
 				break;
 				
 			case "export N match":
-				saveMatchedGPSNodes(matchGPStoNRouteAlgorithm);
+				saveMatchedGPSNodes(matchGPStoNRouteAlgorithm, jxMapMatchGUI.getKMLNorm());
 				break;
 				
 			// user switch/turn off route selecting mode
@@ -329,7 +318,7 @@ public class JXMapMatchController implements ActionListener,
 				
 			// show save dialog for matched GPS points and export file
 			case "Export matched GPS Nodes to file":
-				saveMatchedGPSNodes(gpsToLinkMatcher);
+				saveMatchedGPSNodes(gpsToLinkMatcher, jxMapMatchGUI.getKMLNorm());
 				break;
 				
 			// user executes match to N route algorithm
@@ -733,7 +722,7 @@ public class JXMapMatchController implements ActionListener,
 		worker.execute();
 	}
 	
-	private void saveMatchedGPSNodes(final MatchingGPSObject matchingGPSObj) {
+	private void saveMatchedGPSNodes(final MatchingGPSObject matchingGPSObj, boolean kmlNorm) {
 		// if user choose an valid file
 		if (jFileSaveDialogMatchedGPS.showSaveDialog()){
 			
@@ -748,7 +737,7 @@ public class JXMapMatchController implements ActionListener,
 				@Override
 				protected Boolean doInBackground() throws Exception {
 					try {
-						GPSTraceStreamer.saveMatchedGPSTraceToFile(myMap, matchingGPSObj.getMatchedGPSNodes(), matchingGPSObj.getRefTimeStamp(), jxMapMatchGUI.getNormalizeGPSTimeStamp(), gpsTraceFile.getAbsolutePath(), jxMapMatchGUI, matchGPStoNRouteAlgorithm.getMatchedNLinks());
+						GPSTraceStreamer.saveMatchedGPSTraceToFile(myMap, matchingGPSObj.getMatchedGPSNodes(), matchingGPSObj.getRefTimeStamp(), jxMapMatchGUI.getNormalizeGPSTimeStamp(), gpsTraceFile.getAbsolutePath(), jxMapMatchGUI, matchGPStoNRouteAlgorithm.getMatchedNLinks(), kmlNorm);
 					} catch (Exception e) { 
 						e.printStackTrace();
 						return false;
@@ -999,7 +988,6 @@ public class JXMapMatchController implements ActionListener,
 		return false;
 	}
 	
-	
 	private void initSelectedNRoute(boolean useExistingSelectedNRoute) {
 		
 		// initialize new Selected N Route if existing one shouldn't be used
@@ -1128,6 +1116,10 @@ public class JXMapMatchController implements ActionListener,
 	private void setCheckGPSTraceInBoundary() {
 		
 		int firstInB = -1;
+		
+		if (this.gpsTrace == null) {
+			return;
+		}
 		
 		for (int i=0; i < this.gpsTrace.getNrOfNodes(); i++) {
 			GPSNode n = this.gpsTrace.getNode(i);

@@ -71,6 +71,9 @@ public interface JXMapMatchGUIInterface extends StatusUpdate{
 	public void setReorderNMatch(boolean enable);					// set if N matched GPS nodes should be reordered according the driving direction
 	public boolean getReoderNMatch();								// get if user enabled this feature
 	
+	public void setKMLNorm(boolean enable);							// set if Color KML data standardization
+	public boolean getKMLNorm();									// get if user enabled this feature
+	
 	public void setNormalizeNMatchedGPSTimeStamp(boolean enable);	// set if time stamp of N matched GPS points should be normalized
 	public boolean getNormalizeNMatchedGPSTimeStamp();				// get user choice if time stamps of N matched GPS points should 
 
