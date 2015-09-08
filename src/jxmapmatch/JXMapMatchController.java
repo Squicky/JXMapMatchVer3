@@ -132,7 +132,8 @@ public class JXMapMatchController implements ActionListener,
 	public static Color MULTI_SELECTABLE_LINK_COLOR = Color.GREEN;
 	public static Color SELECTED_LINK_COLOR = Color.ORANGE;
 	public static Color NON_MATCHED_LINK_COLOR = Color.LIGHT_GRAY;
-	public static Color N_ROUTE_LINK_COLOR = new Color(0, 0, 255);
+	public static Color N_ROUTE_LINK_COLOR = Color.ORANGE; //new Color(0, 0, 255);
+	
 	public static Color SELECTABLE_N_ROUTE_COLOR = Color.GREEN;
 	public static Color DELETABLE_N_ROUTE_COLOR = Color.ORANGE;
 	public static Color GPS_TO_N_ROUTE_UNMATCHED_LINK_COLOR = Color.WHITE;
@@ -194,8 +195,8 @@ public class JXMapMatchController implements ActionListener,
 		initMapPainter(jxMapKit, jxMapPainter);
 		
 		// initialize file dialogs with file extension filters
-		String [] s1 = {"osm", "xml"};
-		String [] s2 = {"OpenStreetMap (*.osm)", "OpenStreetMap (*.xml)"};
+		String [] s1 = {"xml", "osm"};
+		String [] s2 = {"OpenStreetMap (*.xml)", "OpenStreetMap (*.osm)"};
 		//jFileOpenDialogGraph = new JFileDialog((Component) jxMapMatchGUI, "large", "Large routing graph (*.large)");
 		jFileOpenDialogGraph = new JFileDialog((Component) jxMapMatchGUI, s1, s2, "C:\\priv\\uni\\MA\\osm_Maps");
 		jFileOpenDialogGPS = new JFileDialog((Component) jxMapMatchGUI, gpsFileExtensions , gpsFileDescriptions, "C:\\priv\\uni\\MA\\TRACES\\TRACES.r59619");
@@ -689,6 +690,10 @@ public class JXMapMatchController implements ActionListener,
 					myMap.loadCellInfos(DatasetCellInfoFolderPath);
 					
 					gpsTrace = GPSTraceStreamer.convertToGPSPath(gpsTraceFile.getAbsolutePath(), jxMapMatchGUI);
+
+					selectedNRouteMode = false;
+					drawMatchedGPStoNRoute = false;
+					
 				} catch (Exception e) {
 					System.out.println(e.toString());
 					return false;
@@ -1117,6 +1122,7 @@ public class JXMapMatchController implements ActionListener,
 		
 		// enable/disable route drawing
 		drawNRoute = drawNRoute();
+
 	}
 	
 	private void setCheckGPSTraceInBoundary() {

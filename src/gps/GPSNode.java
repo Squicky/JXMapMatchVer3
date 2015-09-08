@@ -13,6 +13,7 @@ package gps;
 public class GPSNode {
 	
 	// time stamp
+	@SuppressWarnings("unused")
 	private long timestampOrginal = 0;
     private long timestampInNanoSec = 0;
     private double x = 0;

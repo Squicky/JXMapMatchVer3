@@ -14,7 +14,9 @@ import route.SelectedNRoute;
 public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 
 	// enable/disable additional features
+	@SuppressWarnings("unused")
 	private boolean useReorder = false;
+	@SuppressWarnings("unused")
 	private boolean useProject = false;
 
 	// constants for match GPS to N route algorithm state
@@ -115,8 +117,8 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 				nearestMatchedNLink = currentMatchedNLink;
 
 				myOSMWayPart curWP = currentMatchedNLink.getStreetLink();
-				long curWPOsmID = curWP.parentWay.id;
-				long nextWPOsmID = 0;
+				//long curWPOsmID = curWP.parentWay.id;
+				//long nextWPOsmID = 0;
 
 				double disToCur = Coordinates.getDistance(matchedGPSNode, curWP);
 
@@ -132,7 +134,7 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 
 						myOSMWayPart nextWP = nextMatchedNLink.getStreetLink();
 
-						nextWPOsmID = nextWP.parentWay.id;
+						//nextWPOsmID = nextWP.parentWay.id;
 
 						double disToNextTemp = Coordinates.getDistance(matchedGPSNode, nextWP);
 

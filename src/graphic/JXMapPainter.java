@@ -16,86 +16,15 @@ import algorithm.ReorderedMatchedGPSNode;
 import route.*;
 import gps.GPSTrace;
 import java.awt.*;
-import java.util.Random;
 import java.util.Vector;
 
 /**
  * @author Tobias
  * @author Daniel Sathees Elmo
+ * @author Adrian Skuballa
  */
 
 public class JXMapPainter {
-
-    /**
-     * draw n Route route on Graphics g (Color: color)
-     * use JXMapView map to get zoom
-     * @param g
-     * @param map
-     * @param route
-     * @param color
-     */
-	/*
-    public void drawRoute(Graphics2D g,JXMapViewer map, Route route, Color color){
-        // create graphics
-        g = (Graphics2D) g.create();
-        
-        //convert from viewport to world bitmap
-        Rectangle rect = map.getViewportBounds();
-        g.translate(-rect.x, -rect.y);
-
-        //do the drawing
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        // set brush
-        g.setStroke(new BasicStroke(1));
-        // set color
-        g.setColor(color);
-
-        for(int i=0; i<route.getNrOfSelectedLinks();i++){
-            // draw line for every link in route
-            // devide x,y coordinates by 2^(zoom-1) to fit to current zoom
-            g.drawLine((int)(route.getLink(i).getStartX()/(Math.pow(2, map.getZoom()-1))),
-                    (int)(route.getLink(i).getStartY()/(Math.pow(2, map.getZoom()-1))),
-                    (int)(route.getLink(i).getEndX()/(Math.pow(2, map.getZoom()-1))),
-                    (int)(route.getLink(i).getEndY()/(Math.pow(2, map.getZoom()-1))));
-        }
-        g.dispose();
-    }
-
-
-    /**
-     * draw Route route on Graphics g (Color: color)
-     * use JXMapView map to get zoom
-     * @param g
-     * @param map
-     * @param route
-     * @param color
-     */
-     /*
-    public void drawRouteNodes(Graphics2D g,JXMapViewer map, Route route, Color color){
-        // create graphics
-        g = (Graphics2D) g.create();
-        //convert from viewport to world bitmap
-        Rectangle rect = map.getViewportBounds();
-        g.translate(-rect.x, -rect.y);
-
-        //do the drawing
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        // set brush
-        g.setStroke(new BasicStroke(1));
-        // set color
-        g.setColor(color);
-
-        for(int i=0; i<route.getNrOfNodes();i++){
-            // draw line for every link in route
-            // devide x,y coordinates by 2^(zoom-1) to fit to current zoom
-            //g.drawRect((int)(route.getNode(i).getX()/(Math.pow(2, map.getZoom()-1))),
-            //           (int)(route.getNode(i).getY()/(Math.pow(2, map.getZoom()-1))), 3, 3);
-            g.fillRect((int)(route.getNode(i).getX()/(Math.pow(2, map.getZoom()-1))),
-                       (int)(route.getNode(i).getY()/(Math.pow(2, map.getZoom()-1))), 3, 3);
-        }
-        g.dispose();
-    }
-    */
 
     /**
      * draw GPSPath path on Graphics g (Color: color)

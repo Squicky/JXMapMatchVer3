@@ -70,34 +70,34 @@ public class MatchedNLink {
 		MatchedNLink.setLengthPos(matchedNLinks);
 		
 		MatchedGPSNode minNodePos = null;
-		int minNodeIndex = -1;
+		//int minNodeIndex = -1;
 		MatchedGPSNode maxNodePos = null;
-		int maxNodeIndex = -1;
+		//int maxNodeIndex = -1;
 		MatchedGPSNode maxNodePos2 = null;
-		int maxNodeIndex2 = -1;
+		//int maxNodeIndex2 = -1;
 		
 		boolean inReorderPos = false;
 		int countOutOfReorderPos = 0;
 		
-		double minD = -1;
-		double nD = -1;
-		double maxD = -1;
-		double maxD2 = -1;
+		//double minD = -1;
+		//double nD = -1;
+		//double maxD = -1;
+		//double maxD2 = -1;
 		
 		MatchedGPSNode previousN = null;
 		
 		for (int i = 0; i < gpsNodesToMatch.size(); i++) {
 			MatchedGPSNode n = gpsNodesToMatch.get(i);
 
-			nD = n.lengthPos;
+			//nD = n.lengthPos;
 			
 			if ( previousN != null && n.lengthPos < previousN.lengthPos) {
 				inReorderPos = true;
 				
 				if (maxNodePos2 == null) {
 					maxNodePos2 = previousN;
-					maxD2 = previousN.lengthPos;
-					maxNodeIndex2 = i - 1;
+					//maxD2 = previousN.lengthPos;
+					//maxNodeIndex2 = i - 1;
 				}
 			}
 
@@ -105,19 +105,19 @@ public class MatchedNLink {
 				
 				if (maxNodePos2 == null || n.lengthPos > maxNodePos2.lengthPos) {
 					maxNodePos2 = n;
-					maxD2 = maxNodePos2.lengthPos;
-					maxNodeIndex2 = i;
+					//maxD2 = maxNodePos2.lengthPos;
+					//maxNodeIndex2 = i;
 				}
 				
 				if (minNodePos == null || n.lengthPos < minNodePos.lengthPos) {
 					minNodePos = n;
-					minD = minNodePos.lengthPos;
-					minNodeIndex = i;
+					//minD = minNodePos.lengthPos;
+					//minNodeIndex = i;
 					
 					if (maxNodePos2 != null) {
 						maxNodePos = maxNodePos2;
-						maxD = maxNodePos.lengthPos;
-						maxNodeIndex = maxNodeIndex2;
+						//maxD = maxNodePos.lengthPos;
+						//maxNodeIndex = maxNodeIndex2;
 					}
 				}
 				
@@ -164,11 +164,11 @@ public class MatchedNLink {
 						
 						
 						minNodePos = null;
-						minNodeIndex = -1;
+						//minNodeIndex = -1;
 						maxNodePos = null;
-						maxNodeIndex = -1;
+						//maxNodeIndex = -1;
 						maxNodePos2 = null;
-						maxNodeIndex2 = -1;
+						//maxNodeIndex2 = -1;
 						
 						inReorderPos = false;
 						countOutOfReorderPos = 0;

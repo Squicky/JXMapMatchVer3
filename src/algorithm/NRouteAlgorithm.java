@@ -146,18 +146,18 @@ public class NRouteAlgorithm {
 				// match GPS Point on last link of every path
 				for (NRoute nRoute : sortedSetS) {
 
-					long nRouteObjID = nRoute.objID;
-					long nRouteCountMatched = nRoute.getNRouteLinks().lastElement().getRangeSize();
-					double nRouteScore = nRoute.getScore();
+					//long nRouteObjID = nRoute.objID;
+					//long nRouteCountMatched = nRoute.getNRouteLinks().lastElement().getRangeSize();
+					//double nRouteScore = nRoute.getScore();
 					
 					// match current GPS node to link
 					// Logger.println("\nAdding GPSNode(" + currentGPSNodeIndex
 					// + ") to nRoute Nr." + nRouteIndex);
 					nRoute.addGPSNodeToLastLink(currentGPSNodeIndex);
 
-					long nRouteOsmID = nRoute.getNRouteLinks().lastElement().getStreetLink().parentWay.id;
-					nRouteScore = nRoute.getScore();
-					nRouteCountMatched = nRoute.getNRouteLinks().lastElement().getRangeSize();
+					//long nRouteOsmID = nRoute.getNRouteLinks().lastElement().getStreetLink().parentWay.id;
+					//nRouteScore = nRoute.getScore();
+					//nRouteCountMatched = nRoute.getNRouteLinks().lastElement().getRangeSize();
 					
 					sortedSetV.add(nRoute);
 
@@ -372,17 +372,17 @@ public class NRouteAlgorithm {
 				int lastMatchedGPSNodeIndex = nRouteChild.getLastMatchedLink().getRangeEndIndex();
 				nRouteChild.removeLastGPSNodeFromLastLink();
 
-				long nRouteObjID = nRouteChild.objID;
-				long nRouteCountMatched = nRoute.getNRouteLinks().lastElement().getRangeSize();
-				double nRouteScore = nRouteChild.getScore();
+				//long nRouteObjID = nRouteChild.objID;
+				//long nRouteCountMatched = nRoute.getNRouteLinks().lastElement().getRangeSize();
+				//double nRouteScore = nRouteChild.getScore();
 				
 				// add current outgoing link to child path
 				// match last GPS node on it
 				nRouteChild.addLink(outgoingLink, lastMatchedGPSNodeIndex);
 
-				long nRouteosmID = nRouteChild.getNRouteLinks().lastElement().getStreetLink().parentWay.id;
-				nRouteScore = nRouteChild.getScore();
-				nRouteCountMatched = nRouteChild.getNRouteLinks().lastElement().getRangeSize();
+				//long nRouteosmID = nRouteChild.getNRouteLinks().lastElement().getStreetLink().parentWay.id;
+				//nRouteScore = nRouteChild.getScore();
+				//nRouteCountMatched = nRouteChild.getNRouteLinks().lastElement().getRangeSize();
 				
 				// add child path to hand over sorted set
 				sortedSet.add(nRouteChild);

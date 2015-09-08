@@ -8,12 +8,12 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
-import cartesian.Coordinates;
 import algorithm.MatchedGPSNode;
 import algorithm.MatchedNLink;
 
 public class myCellInfo {
 
+	@SuppressWarnings("unused")
 	private long timestampOrginal = 0;
     private long timestampInNanoSec = 0;
 
@@ -206,7 +206,7 @@ public class myCellInfo {
 		
 		Vector<myCellInfo> v = new Vector<myCellInfo>();
 		
-		int x = 0;
+		//int x = 0;
 		
 		String line = "";
 		try {

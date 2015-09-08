@@ -14,6 +14,7 @@ import algorithm.MatchedNLink;
 
 public class myDataset {
 
+	@SuppressWarnings("unused")
 	private long timestampOrginal = 0;
     private long timestampInNanoSec = 0;
 	public int datarate = -1;
