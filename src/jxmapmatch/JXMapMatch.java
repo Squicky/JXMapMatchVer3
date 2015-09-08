@@ -8,6 +8,7 @@ import dialogelements.JWindowLoading;
  * @author Daniel Sathees Elmo
  * @author Adrian Skuballa
  * 
+ * 
  * This class launch the application by showing a splash screen
  * during all components are loaded
  */

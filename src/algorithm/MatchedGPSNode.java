@@ -26,8 +26,19 @@ public class MatchedGPSNode extends GPSNode {
     protected Color initColor;
     protected Color color;
 
-	public double matched_percent_in_WayParty = -1;
+	public double matched_distribution_in_WayParty = -1;
 	public myOSMWayPart matchtedWayPart = null;
+	
+	public double lengthPos = -1;
+	public double lengthPosReordered = -1;
+	public double matched_distribution_in_WayPartyReordered = -1;
+
+	public double matchedXreordered = 0;
+	public double matchedYreordered = 0;
+	
+	public boolean isReordered = false;
+	
+	MatchedNLink matchedNLink = null;
 	
 	public MatchedGPSNode(GPSNode gpsNode, Color color) {
 		super(gpsNode.getX(), gpsNode.getY(), gpsNode.getTimestamp(), gpsNode.getLon(), gpsNode.getLat());
@@ -39,6 +50,19 @@ public class MatchedGPSNode extends GPSNode {
 		resetMatched();
 	}
 
+	public void setMatchedXYreordered() {
+		double linkXlength = matchedNLink.getStreetLink().endNode.x - matchedNLink.getStreetLink().startNode.x;
+		double linkYlength = matchedNLink.getStreetLink().endNode.y - matchedNLink.getStreetLink().startNode.y;
+
+		matchedXreordered = linkXlength * matched_distribution_in_WayPartyReordered;
+		matchedXreordered += matchedNLink.getStreetLink().startNode.x;
+
+		matchedYreordered = linkYlength * matched_distribution_in_WayPartyReordered;
+		matchedYreordered += matchedNLink.getStreetLink().startNode.y;
+		
+		isReordered = true;
+	}
+	
 	public void setMatchedX(double matchedX) {
 		this.matchedX = matchedX;
 		this.matched = true;

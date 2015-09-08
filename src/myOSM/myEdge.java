@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 public class myEdge {
 
 	public String id_str;
@@ -125,9 +127,7 @@ public class myEdge {
 								}
 							}
 						}
-
 					}
-
 				}
 				
 				line = bReader.readLine();
@@ -135,6 +135,9 @@ public class myEdge {
 			
 			bReader.close();
 		
+		} catch (java.io.FileNotFoundException e) {
+			System.out.println("Error: " + e.toString());
+			JOptionPane.showMessageDialog(null, "File nocht Found: \n" + FilePath, "Error", JOptionPane.CANCEL_OPTION);
 		} catch (Exception e) {			
 			System.out.println("Error: loadGetEdges: \n" + line + "\n" + e.toString());
 		}

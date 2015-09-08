@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
@@ -55,14 +56,14 @@ public class myOSMMap {
 	private int anzahl_ways_Building = 0;
 	private int anzahl_ways_Car = 0;
 	
-	Map<Long, Map<Integer, myEdge>> edges = new HashMap<Long, Map<Integer, myEdge>>();
+	public Map<Long, Map<Integer, myEdge>> edges = new HashMap<Long, Map<Integer, myEdge>>();
 	
-	Vector<myDataset> DatasetsUp = new Vector<myDataset>(200);
-	Vector<myDataset> DatasetsDown = new Vector<myDataset>(200);
+	public Vector<myDataset> DatasetsUp = new Vector<myDataset>(200);
+	public Vector<myDataset> DatasetsDown = new Vector<myDataset>(200);
 	
+	public Vector<myCellInfo> CellInfos = new Vector<myCellInfo>();
 	
 	public myOSMMap() {
-		
 	}
 	
 	public myOSMMap(File _xmlFile, String netFilePath) {
@@ -73,6 +74,11 @@ public class myOSMMap {
 		DatasetsUp = myDataset.loadDatasetsUp(DatasetFolderPath + "upstream-data.csv");
 		DatasetsDown = myDataset.loadDatasetsDown(DatasetFolderPath + "downstream-data.csv");
 	}
+	
+	public void loadCellInfos(String CellInfoFolderPath) {
+		CellInfos = myCellInfo.loadCellInfos(CellInfoFolderPath + "cellinfo.txt");
+	}
+	
 	
 	private void init() {
 		this.nodes = new HashMap<Long, myOSMNode>();
@@ -161,11 +167,9 @@ public class myOSMMap {
 
 	public myDataset getDatasetUp (long Timestamp) {
 		
-		Timestamp = Timestamp * 1000000000L;
-		
 		for (int i = 0; i < DatasetsUp.size(); i++) {
 			
-			if (Timestamp <= DatasetsUp.get(i).timestamp) {
+			if (Timestamp <= DatasetsUp.get(i).getTimestamp()) {
 				return DatasetsUp.get(i);
 			}
 			
@@ -176,11 +180,9 @@ public class myOSMMap {
 
 	public myDataset getDatasetDown (long Timestamp) {
 		
-		Timestamp = Timestamp * 1000000000L;
-		
 		for (int i = 0; i < DatasetsDown.size(); i++) {
 			
-			if (Timestamp <= DatasetsDown.get(i).timestamp) {
+			if (Timestamp <= DatasetsDown.get(i).getTimestamp()) {
 				return DatasetsDown.get(i);
 			}
 			
@@ -232,7 +234,7 @@ public class myOSMMap {
 			while ( parser.hasNext() ) 
 			{ 
 				index_loop++;
-
+				
 				if ((index_loop % 1000000) == 0) {
 					System.out.print((new GregorianCalendar()).getTime().toString() + " | " + index_loop);
 					System.out.println( " | nodes: " + count_nodes + " | ways: " + anzahl_ways + " | w-building: " + anzahl_ways_Building + " | w-cars: " + anzahl_ways_Car );

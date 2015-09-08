@@ -294,24 +294,25 @@ public class Coordinates {
 	 * (double)ay, (double)bx, (double)by); }
 	 */
 
-	public static double getPercentOfPointInWayPart(double matchedX,
+	public static double getDistributionOfPointInWayPart(double matchedX,
 			double matchedY, double ax, double ay, double bx, double by) {
 
 		double lenghtWayPart;
-
-		double lenghtWayPart2 = ((bx - ax) * (bx - ax))
-				+ ((by - ay) * (by - ay));
 
 		double d1 = (bx - ax);
 		d1 = d1 * d1;
 		double d3 = (by - ay);
 		d3 = d3 * d3;
+		
+		lenghtWayPart = d1 + d3;
 
-		if (d1 + d3 != lenghtWayPart2) {
+		double lenghtWayPart2 = ((bx - ax) * (bx - ax))	+ ((by - ay) * (by - ay));
+
+		if (lenghtWayPart != lenghtWayPart2) {
 			lenghtWayPart = lenghtWayPart2;
 		}
 
-		lenghtWayPart = Math.sqrt(d1 + d3);
+		lenghtWayPart = Math.sqrt(lenghtWayPart);
 
 		double ppx = getNearestPointX(matchedX, matchedY, ax, ay, bx, by);
 		double ppy = getNearestPointY(matchedX, matchedY, ax, ay, bx, by);
@@ -321,7 +322,7 @@ public class Coordinates {
 		}
 
 		if (ppx == bx && ppy == by) {
-			return 100;
+			return 1;
 		}
 
 		double lenghtStartToPint;
@@ -333,11 +334,9 @@ public class Coordinates {
 		d3 = d3 * d3;
 		lenghtStartToPint = Math.sqrt(d1 + d3);
 
-		lenghtWayPart = lenghtWayPart / 100.0;
+		double Distribution = lenghtStartToPint / lenghtWayPart;
 
-		double perc = lenghtStartToPint / lenghtWayPart;
-
-		return perc;
+		return Distribution;
 	}
 
 	/**
@@ -428,8 +427,7 @@ public class Coordinates {
 		return new MatchedPoint(x, y, distance, euclidian);
 	}
 
-	public static MatchedPoint getNearestEuclidianPoint(GPSNode gpsNode,
-			myOSMWayPart streetLink) {
+	public static MatchedPoint getNearestEuclidianPoint(GPSNode gpsNode, myOSMWayPart streetLink) {
 		// delegate
 		return getNearestEuclidianPoint(gpsNode.getX(), gpsNode.getY(),
 				streetLink.getStartX(), streetLink.getStartY(),
@@ -446,6 +444,7 @@ public class Coordinates {
 	public static double getDistance(GPSNode gpsNode, myOSMNode myNode) {
 		return getDistance(gpsNode.getX(), gpsNode.getY(), myNode.x, myNode.y);
 	}
+
 
 	/**
 	 * get radical distance between GPS node and street node

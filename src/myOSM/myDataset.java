@@ -6,13 +6,267 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.Vector;
 
+import javax.swing.JOptionPane;
+
+import cartesian.Coordinates;
+import algorithm.MatchedGPSNode;
+import algorithm.MatchedNLink;
+
 public class myDataset {
 
-	public long timestamp = -1;
+	private long timestampOrginal = 0;
+    private long timestampInNanoSec = 0;
 	public int datarate = -1;
 	public double delay = -1;
 	public double loss_rate = -1;
+	public double lengthPos = -1;
+	public double lengthPosInLink = -1;
+	public MatchedNLink matchedNLink = null;
+	public double matched_distribution_in_WayPart = -1;
+	public double X = 0;
+	public double Y = 0;
+	public double Xunmatched = 0;
+	public double Yunmatched = 0;
+	public boolean isMatched = false;
 	
+	public double lengthPosRouteDistributionUnmatched = -1;
+	public double lengthPosRouteDistributionMatched = -1;
+	public MatchedNLink matchedNLinkRouteDistribution = null;
+	public double matched_distribution_in_WayPart_RouteDistribution = -1;
+	public boolean isMatchedRouteDistribution = false;
+	public double X_RouteDistribution = 0;
+	public double Y_RouteDistribution = 0;
+	
+	public long objID = 0;
+	public static long objCount = 0;
+	
+	public myCellInfo cellInfo = null;
+	
+	public myDataset() {
+		objID = objCount;
+		objCount++;		
+	}
+	
+	public static void matchMatchedGPSNode(Vector<myDataset> Datasets, boolean isDatasetDown, Vector<MatchedGPSNode> gpsNodesToMatch,  Vector<MatchedNLink> matchedNLinks, Vector<myCellInfo> CellInfos) {
+		for (myDataset d : Datasets) {
+			d.match(gpsNodesToMatch, matchedNLinks, isDatasetDown, CellInfos);
+		}
+
+		// set var for RouteDistribution
+		myDataset firstMatchedDs = null;
+		int firstMatchedIndex = 0;
+		for (int i = 0; i < Datasets.size(); i++) {
+			if (Datasets.get(i).isMatched) {
+				firstMatchedDs = Datasets.get(i);
+				firstMatchedIndex = i;
+				break;
+			}
+		}
+		myDataset lastMatchedDs = null;
+		int lastMatchedIndex = 0;
+		for (int i = Datasets.size() - 1; i >= 0; i--) {
+			if (Datasets.get(i).isMatched) {
+				lastMatchedDs = Datasets.get(i);
+				lastMatchedIndex = i;
+				break;
+			}
+		}
+		
+		if (firstMatchedDs != null && lastMatchedDs != null) {
+			double lengthPosUnmatched = 0;
+			double dis = 0;
+			myDataset lastDs = null;
+			for (int i = firstMatchedIndex; i <= lastMatchedIndex; i++) {
+				myDataset Ds = Datasets.get(i);
+				
+				if (Ds.isMatched) {
+					if (lastDs != null) {
+						dis = Coordinates.getDistance(lastDs.Xunmatched, lastDs.Yunmatched, Ds.Xunmatched, Ds.Yunmatched);
+					}
+					lengthPosUnmatched += dis;
+					
+					Ds.lengthPosRouteDistributionUnmatched = lengthPosUnmatched;
+					lastDs = Ds;
+				}
+			}
+			
+			double TotalRouteLenMatched = lastMatchedDs.lengthPos - firstMatchedDs.lengthPos;
+
+			for (int i = firstMatchedIndex; i <= lastMatchedIndex; i++) {
+				myDataset Ds = Datasets.get(i);
+				
+				Ds.lengthPosRouteDistributionMatched = firstMatchedDs.lengthPos;
+				double distri = Ds.lengthPosRouteDistributionUnmatched / lengthPosUnmatched;
+				Ds.lengthPosRouteDistributionMatched += TotalRouteLenMatched * distri;
+				
+				for (MatchedNLink link : matchedNLinks) {
+					if (link.lengthPosStart <= Ds.lengthPosRouteDistributionMatched && Ds.lengthPosRouteDistributionMatched <= link.lengthPosEnd) {
+						Ds.matchedNLinkRouteDistribution = link;
+						if (isDatasetDown) {
+							link.matchedDownDatasetsRouteDistribution.add(Ds);							
+						} else {
+							link.matchedUpDatasetsRouteDistribution.add(Ds);
+						}
+						break;
+					}
+				}
+				
+				if (Ds.matchedNLinkRouteDistribution == null) {
+					Ds.isMatchedRouteDistribution = false;
+				} else {
+					double lengthPosInLink = Ds.lengthPosRouteDistributionMatched - Ds.matchedNLinkRouteDistribution.lengthPosStart;
+					
+					Ds.matched_distribution_in_WayPart_RouteDistribution = lengthPosInLink / Ds.matchedNLinkRouteDistribution.getStreetLink().length;
+
+					// set X Y RouteDistribution matched
+					double xLen = Ds.matchedNLinkRouteDistribution.getStreetLink().endNode.x - Ds.matchedNLinkRouteDistribution.getStreetLink().startNode.x;
+					xLen = xLen * Ds.matched_distribution_in_WayPart_RouteDistribution;	
+					Ds.X_RouteDistribution = Ds.matchedNLinkRouteDistribution.getStreetLink().startNode.x + xLen;
+					double yLen = Ds.matchedNLinkRouteDistribution.getStreetLink().endNode.y - Ds.matchedNLinkRouteDistribution.getStreetLink().startNode.y;
+					yLen = yLen * Ds.matched_distribution_in_WayPart_RouteDistribution;	
+					Ds.Y_RouteDistribution = Ds.matchedNLinkRouteDistribution.getStreetLink().startNode.y + yLen;
+
+					Ds.isMatchedRouteDistribution = true;
+				}
+
+			}
+		}
+		
+
+	}
+	
+	public void match(Vector<MatchedGPSNode> gpsNodesToMatch,  Vector<MatchedNLink> matchedNLinks, boolean isDatasetDown, Vector<myCellInfo> CellInfos) {
+		
+		for (int i = CellInfos.size() - 1; i >= 0 ; i--) {
+			myCellInfo ci = CellInfos.get(i);
+			if (ci.getTimestamp() <= this.getTimestamp()) {
+				this.cellInfo = ci;
+				break;
+			}
+		}
+		
+		MatchedGPSNode lastNode = null;
+		for (int i = gpsNodesToMatch.size()-1; i >= 0; i--) {
+			MatchedGPSNode n = gpsNodesToMatch.get(i);
+			if (n.getTimestamp() <= this.getTimestamp()) {
+				lastNode = n;
+				break;
+			}
+		}
+
+		if (lastNode == null) {
+			isMatched = false;
+			return;
+		}
+
+		MatchedGPSNode nextNode = null;
+		for (int i = 0; i < gpsNodesToMatch.size(); i++) {
+			MatchedGPSNode n = gpsNodesToMatch.get(i);
+			if (this.getTimestamp() <= n.getTimestamp()) {
+				nextNode = n;
+				break;
+			}
+		}
+		
+		if (nextNode == null) {
+			isMatched = false;
+			return;
+		}
+
+		double timeTotal = nextNode.getTimestamp() - lastNode.getTimestamp();
+		double timeNode = this.getTimestamp() - lastNode.getTimestamp();
+		double timeDistribution = timeNode / timeTotal;
+		double lenPosTotal;
+		if (nextNode.isReordered) {
+			lenPosTotal = nextNode.lengthPosReordered;
+		} else {
+			lenPosTotal = nextNode.lengthPos;
+		}
+		if (lastNode.isReordered) {
+			lenPosTotal -= lastNode.lengthPosReordered;
+		} else {
+			lenPosTotal -= lastNode.lengthPos;
+		}
+		
+		this.lengthPos = lenPosTotal * timeDistribution;
+		
+		if (lastNode.isReordered) {
+			this.lengthPos += lastNode.lengthPosReordered;
+		} else {
+			this.lengthPos += lastNode.lengthPos;
+		}
+
+		for (MatchedNLink link : matchedNLinks) {
+			if (link.lengthPosStart <= this.lengthPos && this.lengthPos <= link.lengthPosEnd) {
+				this.matchedNLink = link;
+				if (isDatasetDown) {
+					link.matchedDownDatasets.add(this);					
+				} else {
+					link.matchedUpDatasets.add(this);
+				}
+				break;
+			}
+		}
+		
+		if (this.matchedNLink == null) {
+			isMatched = false;
+			return;
+		}
+		
+		this.lengthPosInLink = this.lengthPos - this.matchedNLink.lengthPosStart;
+		
+		this.matched_distribution_in_WayPart = lengthPosInLink / this.matchedNLink.getStreetLink().length;
+
+		// set X Y unmatched
+		double xLen = nextNode.getX() - lastNode.getX();
+		xLen = xLen * timeDistribution;	
+		this.Xunmatched = lastNode.getX() + xLen;
+		double yLen = nextNode.getY() - lastNode.getY();
+		yLen = yLen * timeDistribution;	
+		this.Yunmatched = lastNode.getY() + yLen;
+		
+		// set X Y matched
+		xLen = this.matchedNLink.getStreetLink().endNode.x - this.matchedNLink.getStreetLink().startNode.x;
+		xLen = xLen * this.matched_distribution_in_WayPart;	
+		this.X = this.matchedNLink.getStreetLink().startNode.x + xLen;
+		yLen = this.matchedNLink.getStreetLink().endNode.y - this.matchedNLink.getStreetLink().startNode.y;
+		yLen = yLen * this.matched_distribution_in_WayPart;	
+		this.Y = this.matchedNLink.getStreetLink().startNode.y + yLen;
+		
+		isMatched = true;
+	}
+	
+    /**
+     * @param timestamp
+     */
+    public void setTimestamp(long timestamp){
+
+		this.timestampOrginal = timestamp;
+
+    	if (timestamp <= 0) {
+    		this.timestampInNanoSec = -1;
+    		return;
+    	}
+
+        if (1000000000000000000L < timestamp) { // Nanosec
+        	timestampInNanoSec = timestamp;
+        } else if (1000000000000000L < timestamp) { // Microsec
+        	timestampInNanoSec = timestamp * 1000L;
+        } else if (1000000000000L < timestamp) { // Millisec
+        	timestampInNanoSec = timestamp * 1000000L;
+        } else if (1000000000000L < timestamp) { // Sec
+        	timestampInNanoSec = timestamp * 1000000000L;
+        } else {
+        	this.timestampInNanoSec = -1;
+        }
+    }
+
+    /**
+     * @return (long) timestamp
+     */
+    public long getTimestamp(){
+        return timestampInNanoSec;
+    }
 	
 	public static Vector<myDataset> loadDatasetsUp(String FilePath) {
 		
@@ -62,6 +316,9 @@ public class myDataset {
 			
 			return datasets;
 			
+		} catch (java.io.FileNotFoundException e) {
+			System.out.println("Error: " + e.toString());
+			JOptionPane.showMessageDialog(null, "File nocht Found: \n" + FilePath, "Error", JOptionPane.CANCEL_OPTION);
 		} catch (Exception e) {			
 			System.out.println("Error: loadGetEdges: \n" + line + "\n" + e.toString());
 		}		
@@ -154,9 +411,9 @@ public class myDataset {
 				}
 				
 				try {
-					d.timestamp = Long.parseLong(lines[columnNrTimestamp]);				
+					d.setTimestamp(Long.parseLong(lines[columnNrTimestamp]) );
 				} catch (Exception e) {
-					d.timestamp = -1;
+					d.setTimestamp(-1);
 				}
 				
 				try {

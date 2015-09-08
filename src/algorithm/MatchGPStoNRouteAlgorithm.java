@@ -108,33 +108,32 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 			} else {
 				CountCheckNext = bestCountCheckNext;
 			}			
-			
+
 			for (MatchedGPSNode matchedGPSNode : reorderedMatchedGPSNodes) {
 
 				currentMatchedNLink = matchedNLinks.get(currentNLinkIndex);
 				nearestMatchedNLink = currentMatchedNLink;
-				
+
 				myOSMWayPart curWP = currentMatchedNLink.getStreetLink();
 				long curWPOsmID = curWP.parentWay.id;
 				long nextWPOsmID = 0;
-				
+
 				double disToCur = Coordinates.getDistance(matchedGPSNode, curWP);
 
 				double disToNearest = disToCur;
 				int IndexOfdisToNearest = currentNLinkIndex;
-				
 
 				for (int i = 0; i < CountCheckNext; i++) {
 					if ((currentNLinkIndex + 1 + i) <= maxIndex) {
 
 						int nextNLinkIndex = currentNLinkIndex + 1 + i;
-						
+
 						nextMatchedNLink = matchedNLinks.get(nextNLinkIndex);
-						
+
 						myOSMWayPart nextWP = nextMatchedNLink.getStreetLink();
 
 						nextWPOsmID = nextWP.parentWay.id;
-						
+
 						double disToNextTemp = Coordinates.getDistance(matchedGPSNode, nextWP);
 
 						if (disToNextTemp < disToNearest) {
@@ -146,7 +145,7 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 				}
 
 				currentNLinkIndex = IndexOfdisToNearest;
-				
+
 				/*
 				while (disToNearest < disToCur && currentNLinkIndex != IndexOfdisToNearest) {
 
@@ -343,7 +342,7 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 		double matchedX = Coordinates.getNearestPointX(matchedGPSNode, wp);
 		double matchedY = Coordinates.getNearestPointY(matchedGPSNode, wp);
 
-		matchedGPSNode.matched_percent_in_WayParty = Coordinates.getPercentOfPointInWayPart(matchedX, matchedY,
+		matchedGPSNode.matched_distribution_in_WayParty = Coordinates.getDistributionOfPointInWayPart(matchedX, matchedY,
 				wp.startNode.x, wp.startNode.y, wp.endNode.x, wp.endNode.y);
 
 		matchedGPSNode.matchtedWayPart = wp;

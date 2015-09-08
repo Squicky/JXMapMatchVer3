@@ -1,5 +1,6 @@
 package jxmapmatch;
 
+import gps.GPSNode;
 import gps.GPSTrace;
 import gps.GPSTraceStreamer;
 import graphic.JXMapPainter;
@@ -27,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -74,8 +76,8 @@ public class JXMapMatchController implements ActionListener,
 	private JFileDialog jFileSaveDialogMatchedGPS;
 	
 	// define file extensions & descriptions for filter
-	private String[] gpsFileExtensions = {"txt", "gpx"};
-	private String[] gpsFileDescriptions = {"Text based trace file (*.txt)", "GPX formated xml trace file (*.gpx)"};
+	private String[] gpsFileExtensions = {"log", "txt", "gpx"};
+	private String[] gpsFileDescriptions = { "gps trace log (*.log)", "Text based trace file (*.txt)", "GPX formated xml trace file (*.gpx)"};
 	
 	//street map and GPS trace
 	private GPSTrace gpsTrace;
@@ -120,7 +122,10 @@ public class JXMapMatchController implements ActionListener,
 	private boolean isGPSTraceForSelectedNRoute = false;
 	
 	// Color constants for drawing
-	public static Color STREET_MAP_COLOR = Color.RED;
+	//public static Color STREET_MAP_COLOR = Color.RED;
+	public static Color STREET_MAP_COLOR = new Color(150,150,255);
+	//public static Color STREET_MAP_COLOR = Color.black;
+	
 	public static Color GPS_TRACE_COLOR = Color.BLUE;
 	public static Color GPS_TO_MATCH_COLOR = Color.MAGENTA;
 	public static Color SELECTABLE_LINK_COLOR = Color.YELLOW;
@@ -196,8 +201,8 @@ public class JXMapMatchController implements ActionListener,
 		jFileOpenDialogGPS = new JFileDialog((Component) jxMapMatchGUI, gpsFileExtensions , gpsFileDescriptions, "C:\\priv\\uni\\MA\\TRACES\\TRACES.r59619");
 		//jFileOpenNRoute = new JFileDialog((Component) jxMapMatchGUI, "nroute", "N route (*.nroute)");
 		jFileSaveNRoute = new JFileDialog((Component) jxMapMatchGUI, "nroute", "N route (*.nroute)");
-		String [] s3 = {"txt"};
-		String [] s4 = {"Text based files (*.txt)"};
+		String [] s3 = {"csv"};
+		String [] s4 = {"character-separated valuess (*.csv)"};
 		jFileSaveDialogMatchedGPS = new JFileDialog((Component) jxMapMatchGUI, s3, s4, "C:\\priv\\Uni\\MA");
 		
 		// check program call arguments, and load map/trace files
@@ -216,7 +221,19 @@ public class JXMapMatchController implements ActionListener,
 			// if nothing was loaded yet and map file path was passed
 			if ((loadStatus == MAP_TO_LOAD) && (arguments.length > 0)) {
 				// load map file, first parameter must contain map file path
-				openRoutingGraph(arguments[MAP_FILE_INDEX], arguments[MAP_FILE_INDEX].replace(".osm", ".net.xml"), CLIENT_ARGUMENTS);
+				
+				String s = arguments[MAP_FILE_INDEX];
+				if (s.endsWith(".osm")) {
+					s = s.replace(".osm", ".net.xml");
+				} else if (s.endsWith(".osm.xml")) {
+					s = s.replace(".osm.xml", ".net.xml");
+				} else {
+					System.out.println("OSM Filename has to end with \".osm\" or \".osm.xml\" !");
+					System.out.println(".NET Filenname has to be the smae like the OSM Filename and has to end with \".net.xml\" !");
+					System.exit(-1);
+				}
+				
+				openRoutingGraph(arguments[MAP_FILE_INDEX], s, CLIENT_ARGUMENTS);
 			}
 			// if map was loaded and a second argument was passed 
 			else if ((loadStatus == MAP_LOADED) && (arguments.length == 2))  {
@@ -226,7 +243,19 @@ public class JXMapMatchController implements ActionListener,
 			else if ((loadStatus == NROUTE_MAP_TO_LOAD) && (arguments.length > 0)) {
 				// load map file, first parameter must contain map file path, tell
 				// function to callback this method in order to possibly load N route
-				openRoutingGraph(arguments[MAP_FILE_INDEX], arguments[MAP_FILE_INDEX].replace(".osm", ".net.xml"), NROUTE_ARGUMENTS);
+				
+				String s = arguments[MAP_FILE_INDEX];
+				if (s.endsWith(".osm")) {
+					s = s.replace(".osm", ".net.xml");
+				} else if (s.endsWith(".osm.xml")) {
+					s = s.replace(".osm.xml", ".net.xml");
+				} else {
+					System.out.println("OSM Filename has to end with \".osm\" or \".osm.xml\" !");
+					System.out.println(".NET Filenname has to be the smae like the OSM Filename and has to end with \".net.xml\" !");
+					System.exit(-1);
+				}
+				
+				openRoutingGraph(arguments[MAP_FILE_INDEX], s, NROUTE_ARGUMENTS);
 			}
 			else if ((loadStatus == NROUTE_MAP_LOADED) && (arguments.length == 2)) {
 				// load N route from file
@@ -496,7 +525,17 @@ public class JXMapMatchController implements ActionListener,
 		// if user choose an valid file load routing graph
 		if (jFileOpenDialogGraph.showOpenDialog()){
 			File f = jFileOpenDialogGraph.getSelectedFile();
-			String netFilePath = f.getAbsolutePath().replace(".osm", ".net.xml");
+			String s = f.getAbsolutePath();
+			if (s.endsWith(".osm")) {
+				s = s.replace(".osm", ".net.xml");
+			} else if (s.endsWith(".osm.xml")) {
+				s = s.replace(".osm.xml", ".net.xml");
+			} else {
+				System.out.println("OSM Filename has to end with \".osm\" or \".osm.xml\" !");
+				System.out.println(".NET Filenname has to be the smae like the OSM Filename and has to end with \".net.xml\" !");
+				System.exit(-1);
+			}
+			String netFilePath = s;
 			openRoutingGraph(jFileOpenDialogGraph.getSelectedFile(), netFilePath, CLIENT_FILE_DIALOG);
 		}
 	}
@@ -625,7 +664,7 @@ public class JXMapMatchController implements ActionListener,
 		// get chosen GPS trace file
 		final File gpsTraceFile = file;
 
-		final String _DatasetFolderPath = gpsTraceFile.getPath().replace(gpsTraceFile.getName(), "");
+		final String DatasetCellInfoFolderPath = gpsTraceFile.getPath().replace(gpsTraceFile.getName(), "");
 		
 		if (this.myMap == null) {
 			this.myMap = new myOSMMap();
@@ -645,7 +684,9 @@ public class JXMapMatchController implements ActionListener,
 			protected Boolean doInBackground() throws Exception {
 				// try to load GPS trace from file
 				try {
-					myMap.loadDatasets(_DatasetFolderPath);
+					myMap.loadDatasets(DatasetCellInfoFolderPath);
+					
+					myMap.loadCellInfos(DatasetCellInfoFolderPath);
 					
 					gpsTrace = GPSTraceStreamer.convertToGPSPath(gpsTraceFile.getAbsolutePath(), jxMapMatchGUI);
 				} catch (Exception e) {
@@ -702,7 +743,7 @@ public class JXMapMatchController implements ActionListener,
 				@Override
 				protected Boolean doInBackground() throws Exception {
 					try {
-						GPSTraceStreamer.saveMatchedGPSTraceToFile(matchingGPSObj.getMatchedGPSNodes(), matchingGPSObj.getRefTimeStamp(), jxMapMatchGUI.getNormalizeGPSTimeStamp(), gpsTraceFile.getAbsolutePath(), jxMapMatchGUI, matchGPStoNRouteAlgorithm.getMatchedNLinks());
+						GPSTraceStreamer.saveMatchedGPSTraceToFile(myMap, matchingGPSObj.getMatchedGPSNodes(), matchingGPSObj.getRefTimeStamp(), jxMapMatchGUI.getNormalizeGPSTimeStamp(), gpsTraceFile.getAbsolutePath(), jxMapMatchGUI, matchGPStoNRouteAlgorithm.getMatchedNLinks());
 					} catch (Exception e) { 
 						e.printStackTrace();
 						return false;
@@ -1069,11 +1110,53 @@ public class JXMapMatchController implements ActionListener,
 		// get mode of N route algorithm panel by reversing current mode
 		isNRouteAlgorithmMode = jxMapMatchGUI.getNRouteAlgorithmMode();
 		
+		setCheckGPSTraceInBoundary();
+		
 		// set GUI to chosen mode
 		jxMapMatchGUI.setNRouteAlgorithmMode(isNRouteAlgorithmMode, allowNRouteLoadGPSTrace);
 		
 		// enable/disable route drawing
 		drawNRoute = drawNRoute();
+	}
+	
+	private void setCheckGPSTraceInBoundary() {
+		
+		int firstInB = -1;
+		
+		for (int i=0; i < this.gpsTrace.getNrOfNodes(); i++) {
+			GPSNode n = this.gpsTrace.getNode(i);
+			
+			if (this.myMap.osmMinLat <= n.getLat() && n.getLat() <= this.myMap.osmMaxLat && 
+					this.myMap.osmMinLon <= n.getLon() && n.getLon() <= this.myMap.osmMaxLon ) {
+				
+				firstInB = i;
+				break;
+			}
+		}
+		
+		if (firstInB == -1) {			
+			JOptionPane.showInternalMessageDialog(null, "All GPS Trace Points are not in the OSM Boundary", "Message", JOptionPane.CANCEL_OPTION);
+			return;
+		}
+		
+		int lastInB = -1;
+		
+		for (int i = firstInB; i < this.gpsTrace.getNrOfNodes(); i++) {
+			GPSNode n = this.gpsTrace.getNode(i);
+			
+			if (this.myMap.osmMinLat <= n.getLat() && n.getLat() <= this.myMap.osmMaxLat && 
+					this.myMap.osmMinLon <= n.getLon() && n.getLon() <= this.myMap.osmMaxLon ) {
+				lastInB = i;
+			} else {
+				break;
+			}
+		}
+		
+		if (firstInB != 0 || lastInB != this.gpsTrace.getNrOfNodes() - 1) {
+			JOptionPane.showMessageDialog(null, "Not all GPS Trace Points (" + (lastInB - firstInB + 1) + "/" + this.gpsTrace.getNrOfNodes() + ") are in the OSM Boundary: GPS Trace shrinked !", "Message", JOptionPane.CANCEL_OPTION);
+
+			this.gpsTrace.shrinkTrace(firstInB, lastInB);
+		}
 	}
 	
 	/**

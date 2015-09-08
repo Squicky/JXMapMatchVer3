@@ -121,15 +121,15 @@ public class JXMapPainter {
         g.setStroke(new BasicStroke(1));
         
     	Rectangle Rectangle_getViewportBounds = map.getViewportBounds();
-    	int x_min = (int) Rectangle_getViewportBounds.getMinX();
-    	int y_min = (int) Rectangle_getViewportBounds.getMinY();
-    	int x_max = (int) Rectangle_getViewportBounds.getMaxX();
-    	int y_max = (int) Rectangle_getViewportBounds.getMaxY();
+    	double x_min = Rectangle_getViewportBounds.getMinX();
+    	double y_min = Rectangle_getViewportBounds.getMinY();
+    	double x_max = Rectangle_getViewportBounds.getMaxX();
+    	double y_max = Rectangle_getViewportBounds.getMaxY();
 
-    	x_min = (x_min + 1) * (int) zoomFactor;
-    	y_min = (y_min + 1) * (int) zoomFactor;
-    	x_max = (x_max + 1) * (int) zoomFactor;
-    	y_max = (y_max + 1) * (int) zoomFactor;
+    	x_min = (x_min + 1) * zoomFactor;
+    	y_min = (y_min + 1) * zoomFactor;
+    	x_max = (x_max + 1) * zoomFactor;
+    	y_max = (y_max + 1) * zoomFactor;
 
         //draw every GPS node of trace
         for(MatchedGPSNode matchedGPSNode : gpsNodesToMatch){
@@ -167,15 +167,15 @@ public class JXMapPainter {
         g.setStroke(new BasicStroke(1));
         
     	Rectangle Rectangle_getViewportBounds = map.getViewportBounds();
-    	int x_min = (int) Rectangle_getViewportBounds.getMinX();
-    	int y_min = (int) Rectangle_getViewportBounds.getMinY();
-    	int x_max = (int) Rectangle_getViewportBounds.getMaxX();
-    	int y_max = (int) Rectangle_getViewportBounds.getMaxY();
+    	double x_min = Rectangle_getViewportBounds.getMinX();
+    	double y_min = Rectangle_getViewportBounds.getMinY();
+    	double x_max = Rectangle_getViewportBounds.getMaxX();
+    	double y_max = Rectangle_getViewportBounds.getMaxY();
     	
-    	x_min = (x_min + 1) * (int) zoomFactor;
-    	y_min = (y_min + 1) * (int) zoomFactor;
-    	x_max = (x_max + 1) * (int) zoomFactor;
-    	y_max = (y_max + 1) * (int) zoomFactor;
+    	x_min = (x_min + 1) * zoomFactor;
+    	y_min = (y_min + 1) * zoomFactor;
+    	x_max = (x_max + 1) * zoomFactor;
+    	y_max = (y_max + 1) * zoomFactor;
         
     	double x;
     	double y;
@@ -231,15 +231,15 @@ public class JXMapPainter {
         g.setColor(Color.YELLOW);
         
     	Rectangle Rectangle_getViewportBounds = map.getViewportBounds();
-    	int x_min = (int) Rectangle_getViewportBounds.getMinX();
-    	int y_min = (int) Rectangle_getViewportBounds.getMinY();
-    	int x_max = (int) Rectangle_getViewportBounds.getMaxX();
-    	int y_max = (int) Rectangle_getViewportBounds.getMaxY();
+    	double x_min = Rectangle_getViewportBounds.getMinX();
+    	double y_min = Rectangle_getViewportBounds.getMinY();
+    	double x_max = Rectangle_getViewportBounds.getMaxX();
+    	double y_max = Rectangle_getViewportBounds.getMaxY();
     	
-    	x_min = (x_min + 1) * (int) zoomFactor;
-    	y_min = (y_min + 1) * (int) zoomFactor;
-    	x_max = (x_max + 1) * (int) zoomFactor;
-    	y_max = (y_max + 1) * (int) zoomFactor;
+    	x_min = (x_min + 1) * zoomFactor;
+    	y_min = (y_min + 1) * zoomFactor;
+    	x_max = (x_max + 1) * zoomFactor;
+    	y_max = (y_max + 1) * zoomFactor;
         
 		// draw route for each route
     	
@@ -249,7 +249,6 @@ public class JXMapPainter {
         	
         	//if (i == cc) 
         	{
-
         		NRoute nRoute = nRoutes.get(i);
         		
         		//System.out.println(i + "/" + nRoutes.size() + " | " + nRoute.getLastOSMWayPart().get(0).parentWay.id + " | " + nRoute.getScore());
@@ -274,9 +273,7 @@ public class JXMapPainter {
     				
     				indexWP++;
     			}
-    			
         	}
-	
         }
         
         for (int i=0; i < nRoutes.size(); i++ ){
@@ -332,15 +329,15 @@ public class JXMapPainter {
         g.setColor(nRouteColor);
         
     	Rectangle Rectangle_getViewportBounds = map.getViewportBounds();
-    	int x_min = (int) Rectangle_getViewportBounds.getMinX();
-    	int y_min = (int) Rectangle_getViewportBounds.getMinY();
-    	int x_max = (int) Rectangle_getViewportBounds.getMaxX();
-    	int y_max = (int) Rectangle_getViewportBounds.getMaxY();
+    	double x_min = Rectangle_getViewportBounds.getMinX();
+    	double y_min = Rectangle_getViewportBounds.getMinY();
+    	double x_max = Rectangle_getViewportBounds.getMaxX();
+    	double y_max = Rectangle_getViewportBounds.getMaxY();
     	
-    	x_min = (x_min + 1) * (int) zoomFactor;
-    	y_min = (y_min + 1) * (int) zoomFactor;
-    	x_max = (x_max + 1) * (int) zoomFactor;
-    	y_max = (y_max + 1) * (int) zoomFactor;
+    	x_min = (x_min + 1) * zoomFactor;
+    	y_min = (y_min + 1) * zoomFactor;
+    	x_max = (x_max + 1) * zoomFactor;
+    	y_max = (y_max + 1) * zoomFactor;
         
         //draw selected N route (Start)
 		for (myOSMWayPart nRouteLink : selectedNRoute.getNRouteLinksStart()) {
@@ -405,15 +402,15 @@ public class JXMapPainter {
         g.setStroke(new BasicStroke(4));
 
     	Rectangle Rectangle_getViewportBounds = map.getViewportBounds();
-    	int x_min = (int) Rectangle_getViewportBounds.getMinX();
-    	int y_min = (int) Rectangle_getViewportBounds.getMinY();
-    	int x_max = (int) Rectangle_getViewportBounds.getMaxX();
-    	int y_max = (int) Rectangle_getViewportBounds.getMaxY();
+    	double x_min = Rectangle_getViewportBounds.getMinX();
+    	double y_min = Rectangle_getViewportBounds.getMinY();
+    	double x_max = Rectangle_getViewportBounds.getMaxX();
+    	double y_max = Rectangle_getViewportBounds.getMaxY();
     	
-    	x_min = (x_min - 1) * (int) zoomFactor;
-    	y_min = (y_min - 1) * (int) zoomFactor;
-    	x_max = (x_max + 1) * (int) zoomFactor;
-    	y_max = (y_max + 1) * (int) zoomFactor;
+    	x_min = (x_min - 1) * zoomFactor;
+    	y_min = (y_min - 1) * zoomFactor;
+    	x_max = (x_max + 1) * zoomFactor;
+    	y_max = (y_max + 1) * zoomFactor;
         
         //draw selected route
         if (!selectedRoute.isEmpty()){
@@ -461,7 +458,7 @@ public class JXMapPainter {
         	if (myMap.ways != null){
         		c++;
         		if (myMap.ways.size() != 0) {
-            		c = c % myMap.ways.size();    		        		        			
+            		c = c % myMap.ways.size();
         		}
         	}
     	}
@@ -480,18 +477,18 @@ public class JXMapPainter {
         // set color
         g.setColor(color);
 
-    	Random random = new Random();
+        //Random random = new Random();
     	
     	Rectangle Rectangle_getViewportBounds = map.getViewportBounds();
-    	int x_min = (int) Rectangle_getViewportBounds.getMinX();
-    	int y_min = (int) Rectangle_getViewportBounds.getMinY();
-    	int x_max = (int) Rectangle_getViewportBounds.getMaxX();
-    	int y_max = (int) Rectangle_getViewportBounds.getMaxY();
+    	double x_min = (int) Rectangle_getViewportBounds.getMinX();
+    	double y_min = (int) Rectangle_getViewportBounds.getMinY();
+    	double x_max = (int) Rectangle_getViewportBounds.getMaxX();
+    	double y_max = (int) Rectangle_getViewportBounds.getMaxY();
     	
-    	x_min = (x_min + 1) * (int) zoomFactor;
-    	y_min = (y_min + 1) * (int) zoomFactor;
-    	x_max = (x_max + 1) * (int) zoomFactor;
-    	y_max = (y_max + 1) * (int) zoomFactor;
+    	x_min = (x_min + 1) * zoomFactor;
+    	y_min = (y_min + 1) * zoomFactor;
+    	x_max = (x_max + 1) * zoomFactor;
+    	y_max = (y_max + 1) * zoomFactor;
     	
     	if (myMap != null ) {
         	
@@ -502,15 +499,7 @@ public class JXMapPainter {
     		for (int i=0; i < myMap.ways.size(); i++) {
 
 				myOSMWay w = myMap.ways.get(i);
-				
-//				if ( (x_min <= w.minX && w.minX <= x_max && y_min <= w.minY && w.minY <= y_max) 
-//    					|| (x_min <= w.maxX && w.maxX <= x_max && y_min <= w.maxY && w.maxY <= y_max)
-//    					) {
-					
-					color = new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-	        		g.setColor(color);
-	        		
-	        		
+
 	    			for (int j=0; j < w.WayParts.length; j++) {
 
 	    				wp = w.WayParts[j];
@@ -521,43 +510,13 @@ public class JXMapPainter {
 	    					|| (x_min <= n2.x && n2.x <= x_max && y_min <= n2.y && n2.y <= y_max)
 	    					) {
 	    					
-	        				g.setColor(new Color(150,150,255));
-	        				
-	        				/*
-	    					if (w.onyWay == false) {
-	            				g.setColor(Color.GREEN);
-	            			} 
-	                		else {
-	                			if (n1.x == n2.x) {
-	                				if (n1.y <= n2.y) {
-	                					g.setColor(Color.ORANGE);
-	                				}
-	                				else {
-	                					g.setColor(Color.YELLOW);
-	                				}
-	                			} else {
-	                				if (n1.x < n2.x) {
-	                					g.setColor(Color.YELLOW);
-	                				} else {
-	                					g.setColor(Color.ORANGE);
-	                				}
-	                			}
-	                		}
-	                		*/
-
 //	        				if (c == i) 
 	        				{
 		            			g.drawLine((int)(n1.x / zoomFactor), (int)(n1.y / zoomFactor), (int)(n2.x / zoomFactor), (int)(n2.y / zoomFactor));	        					
 //		        				System.out.println(w.id);
 	        				}
-	        				
-	        				
 	    				}
-
 	    			}
-
-//				}
-
     		}
 
     		g.dispose();
@@ -616,15 +575,15 @@ public class JXMapPainter {
         g.setStroke(new BasicStroke(4));
         
     	Rectangle Rectangle_getViewportBounds = map.getViewportBounds();
-    	int x_min = (int) Rectangle_getViewportBounds.getMinX();
-    	int y_min = (int) Rectangle_getViewportBounds.getMinY();
-    	int x_max = (int) Rectangle_getViewportBounds.getMaxX();
-    	int y_max = (int) Rectangle_getViewportBounds.getMaxY();
+    	double x_min = Rectangle_getViewportBounds.getMinX();
+    	double y_min = Rectangle_getViewportBounds.getMinY();
+    	double x_max = Rectangle_getViewportBounds.getMaxX();
+    	double y_max = Rectangle_getViewportBounds.getMaxY();
     	
-    	x_min = (x_min + 1) * (int) zoomFactor;
-    	y_min = (y_min + 1) * (int) zoomFactor;
-    	x_max = (x_max + 1) * (int) zoomFactor;
-    	y_max = (y_max + 1) * (int) zoomFactor;
+    	x_min = (x_min + 1) * zoomFactor;
+    	y_min = (y_min + 1) * zoomFactor;
+    	x_max = (x_max + 1) * zoomFactor;
+    	y_max = (y_max + 1) * zoomFactor;
         
         //draw selected N route (Start)
 		for (MatchedNLink matchedNLink : matchedNLinks) {

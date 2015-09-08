@@ -2,29 +2,20 @@ package jxmapmatch;
 
 import interfaces.JXMapMatchGUIInterface;
 import interfaces.StatusUpdate;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+
+import java.awt.*;
+import java.awt.event.*;
 import java.util.EventListener;
 import java.util.Hashtable;
+
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.border.*;
 import javax.swing.event.ChangeListener;
-import org.jdesktop.swingx.JXMapKit;
-import org.jdesktop.swingx.JXMapViewer;
+
+import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
+
 import tools.Tools;
 import dialogelements.JPanelBoxLayout;
 import static algorithm.NRouteAlgorithm.*;
@@ -32,6 +23,7 @@ import static algorithm.MatchGPStoNRouteAlgorithm.*;
 
 /**
  * @author Daniel Sathees Elmo
+ * @author Adrian Skuballa
  *
  *         This class represents the GUI of JXMapMatcher implements all
  *         functions demanded by JXMapMatchInterface
@@ -82,6 +74,7 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 	//private JCheckBox jCheckBoxSelectedRoute;
 	private JCheckBox jCheckBoxProjectNMatch;
 	private JCheckBox jCheckBoxReorderNMatch;
+	
 	private JCheckBox jCheckBoxNRouteNormalizeMatchedGPSTimeStamp_2;
 	private JCheckBox jCheckBoxNormalizeGPSTimeStamp;
 
@@ -119,8 +112,8 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 
 	// default values for custom tile factory initialization
 	private static int MIN_ZOOM_DEFAULT = 0;
-	private static int MAX_ZOOM_DEFAULT = 19;
-	private static int TOTAL_ZOOM_DEFAULT = 19;
+	private static int MAX_ZOOM_DEFAULT = 17;
+	private static int TOTAL_ZOOM_DEFAULT = 17;
 	private static int TILE_SIZE_DEFAULT = 256;
 	private static boolean X_ORIENTATION_DEFAULT = true;
 	private static boolean Y_ORIENTATION_DEFAULT = true;
@@ -161,7 +154,7 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 	 */
 	public JXMapMatchGUI(StatusUpdate statusUpdate) {
 		// call constructor of super class
-		super("JXMapMatch ver2");
+		super("JXMapMatchVer3");
 
 		this.setVisible(true);
 
@@ -293,6 +286,8 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		jxMapViewer = jxMapKit.getMainMap();
 		// add to container
 		container.add(jxMapKit);
+
+		setTileFactory("http://tile.openstreetmap.org","x","y","z");
 	}
 
 	private void initSourcePanel(Container container) {
@@ -507,8 +502,8 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		jPanelNRoute.add(jSpinnerNRouteSize);
 		// jPanelNRoute.add(jLabelNRouteTreshold);
 		// jPanelNRoute.add(jSpinnerNRouteThreshold);
-		jPanelNRoute.add(jCheckBoxReorderNMatch);
-		jPanelNRoute.add(jCheckBoxProjectNMatch);
+		//jPanelNRoute.add(jCheckBoxReorderNMatch);
+		//jPanelNRoute.add(jCheckBoxProjectNMatch);
 		jPanelNRoute.add(horBox1);
 		jPanelNRoute.add(horBox2);
 		jPanelNRoute.add(horBox3);
@@ -623,13 +618,10 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		) {
 			@Override
 			public String getTileUrl(int x, int y, int z) {
-
-				// return "C:\\priv\\uni\\MA\\hintergrund.png";
-				return this.baseURL + (totalZoom - z) + "/" + x + "/" + y
-						+ ".png";
+				return this.baseURL + (totalZoom - z) + "/" + x + "/" + y + ".png";
 			}
 		};
-
+		
 		// add new tile factory to our map kit
 		jxMapKit.setTileFactory(new DefaultTileFactory(tileFactoryInfo));
 	}
@@ -640,9 +632,13 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 	 */
 
 	@Override
-	public void setTileFactory(String url, String xParam, String yParam,
-			String zParam) {
+	public void setTileFactory(String url, String xParam, String yParam, String zParam) {
 		// call overloaded method with default values
+		
+		if (url.endsWith("/") == false) {
+			url = url + "/";
+		}
+		
 		setTileFactory(url, xParam, yParam, zParam, MIN_ZOOM_DEFAULT,
 				MAX_ZOOM_DEFAULT, TOTAL_ZOOM_DEFAULT, TILE_SIZE_DEFAULT,
 				X_ORIENTATION_DEFAULT, Y_ORIENTATION_DEFAULT);

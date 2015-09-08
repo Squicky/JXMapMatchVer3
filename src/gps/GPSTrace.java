@@ -7,6 +7,8 @@ import cartesian.Coordinates;
 /**
  * @author Tobias
  * @author Daniel Sathees Elmo
+ * @author Adrian Skuballa
+ * 
  */
 
 //TODO replace array with current, more dynamic structure
@@ -39,6 +41,31 @@ public class GPSTrace {
         maxNrOfNodes = nrOfGPSPoints;
         nodes = new GPSNode[maxNrOfNodes];
         this.refTimeStamp = timestamp;
+    }
+    
+    public void shrinkTrace(int startIndex, int endIndex) {
+    	
+    	if (startIndex > endIndex) {
+    		return;
+    	} else if (startIndex < 0) {
+    		return;
+    	} else if (this.nrOfNodes <= endIndex) {
+    		return;
+    	}
+    	
+    	minX=Integer.MAX_VALUE;
+        minY=Integer.MAX_VALUE;
+        maxX=-Integer.MAX_VALUE;
+        maxY=-Integer.MAX_VALUE;
+    	
+        GPSNode [] nodesOld = nodes;
+        nrOfNodes=0;
+        maxNrOfNodes=endIndex - startIndex + 1;
+        nodes = new GPSNode[maxNrOfNodes];
+        
+        for (int i = startIndex; i <= endIndex; i++) {
+        	this.addNode(nodesOld[i]);
+        }
     }
     
     public int getNodeStatus(int index) {

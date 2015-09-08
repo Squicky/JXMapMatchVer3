@@ -13,7 +13,8 @@ package gps;
 public class GPSNode {
 	
 	// time stamp
-    private long timestamp = 0;
+	private long timestampOrginal = 0;
+    private long timestampInNanoSec = 0;
     private double x = 0;
     private double y = 0;
     private double lat = 0;
@@ -31,9 +32,9 @@ public class GPSNode {
     	// save position and timestamp
         this.x = x;
         this.y = y;
-        this.timestamp = timestamp;	
+        this.setTimestamp(timestamp);
         this.lon = lon;
-        this.lat = lat;        
+        this.lat = lat;
     }
     
     /**
@@ -89,7 +90,25 @@ public class GPSNode {
      * @param timestamp
      */
     public void setTimestamp(long timestamp){
-        this.timestamp = timestamp;
+
+		this.timestampOrginal = timestamp;
+
+    	if (timestamp <= 0) {
+    		this.timestampInNanoSec = -1;
+    		return;
+    	}
+    	
+        if (1000000000000000000L < timestamp) { // Nanosec
+        	timestampInNanoSec = timestamp;
+        } else if (1000000000000000L < timestamp) { // Microsec
+        	timestampInNanoSec = timestamp * 1000L;
+        } else if (1000000000000L < timestamp) { // Millisec
+        	timestampInNanoSec = timestamp * 1000000L;
+        } else if (1000000000L < timestamp) { // Sec
+        	timestampInNanoSec = timestamp * 1000000000L;
+        }  else {
+        	this.timestampInNanoSec = -1;
+        }
     }
 
     /**
@@ -97,6 +116,6 @@ public class GPSNode {
      * @return (long) timestamp
      */
     public long getTimestamp(){
-        return timestamp;
+        return timestampInNanoSec;
     }
 }

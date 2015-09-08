@@ -127,13 +127,6 @@ public class NRouteAlgorithm {
 			// 3. get next GPS point
 			for (int currentGPSNodeIndex = gpsNodeIndex + 1; currentGPSNodeIndex < gpsTrace.getNrOfNodes(); currentGPSNodeIndex++) {
 
-				GPSNode gpsn = gpsTrace.getNode(currentGPSNodeIndex);
-				
-				if (currentGPSNodeIndex == 4) {
-					currentGPSNodeIndex++;
-					currentGPSNodeIndex--;
-				}
-				
 				gpsTrace.setNodeStatus(currentGPSNodeIndex, 1);
 
 				// sleep thread and refresh GUI for animation or pause if

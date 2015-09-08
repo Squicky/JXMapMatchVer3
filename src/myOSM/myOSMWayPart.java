@@ -113,8 +113,7 @@ public class myOSMWayPart {
 
 	public void setEdge() {
 
-		Map<Integer, myEdge> edges = this.parentWay.map.edges
-				.get(this.parentWay.id);
+		Map<Integer, myEdge> edges = this.parentWay.map.edges.get(this.parentWay.id);
 
 		this.edge = null;
 
