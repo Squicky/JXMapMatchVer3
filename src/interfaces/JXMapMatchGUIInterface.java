@@ -73,6 +73,9 @@ public interface JXMapMatchGUIInterface extends StatusUpdate{
 	
 	public void setKMLNorm(boolean enable);							// set if Color KML data standardization
 	public boolean getKMLNorm();									// get if user enabled this feature
+
+	public void setUniqueGPS(boolean enable);						// set if matched GPS neighbor are enabled to be unique
+	public boolean getUniqueGPS();									// get if user enabled this feature
 	
 	public void setNormalizeNMatchedGPSTimeStamp(boolean enable);	// set if time stamp of N matched GPS points should be normalized
 	public boolean getNormalizeNMatchedGPSTimeStamp();				// get user choice if time stamps of N matched GPS points should 

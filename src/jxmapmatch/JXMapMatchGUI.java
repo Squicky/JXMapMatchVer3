@@ -72,6 +72,7 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 	private JCheckBox jCheckBoxReorderNMatch;
 	
 	private JCheckBox jCheckBoxKMLNorm;
+	private JCheckBox jCheckBoxUniqueGPS;
 	
 	private JCheckBox jCheckBoxNRouteNormalizeMatchedGPSTimeStamp_2;
 	private JCheckBox jCheckBoxNormalizeGPSTimeStamp;
@@ -462,7 +463,12 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		jCheckBoxKMLNorm = new JCheckBox("KML Norm");
 		this.setKMLNorm(true);
 		jCheckBoxKMLNorm.setAlignmentX(CENTER_ALIGNMENT);
-
+		
+		jCheckBoxUniqueGPS = new JCheckBox("Unique");
+		jCheckBoxUniqueGPS.setToolTipText("different matched neighboring measured value");
+		setUniqueGPS(true);
+		jCheckBoxUniqueGPS.setAlignmentX(CENTER_ALIGNMENT);
+		
 		// create JButtons
 		jButtonNRouteRoute = new JButton("Route");
 		jButtonNRouteRoute.setActionCommand("change N route algorithm state");
@@ -486,6 +492,7 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		// create horizontal boxes
 		Box horBox1 = Box.createHorizontalBox();
 		Box horBox2 = Box.createHorizontalBox();
+		Box horBox2_1 = Box.createHorizontalBox();
 		Box horBox3 = Box.createHorizontalBox();
 		//Box horBox4 = Box.createHorizontalBox();
 		Box horBox5 = Box.createHorizontalBox();
@@ -497,6 +504,8 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		//horBox3.add(jButtonNRouteSave);
 		
 		horBox5.add(jCheckBoxKMLNorm);
+		
+		horBox2_1.add(jCheckBoxUniqueGPS);
 		
 		//horBox4.add(jButtonNRouteReset);
 
@@ -514,6 +523,7 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		
 		jPanelNRoute.add(horBox1);
 		jPanelNRoute.add(horBox2);
+		jPanelNRoute.add(horBox2_1);
 		jPanelNRoute.add(horBox3);
 		//jPanelNRoute.add(horBox4);
 		jPanelNRoute.add(horBox5);
@@ -779,6 +789,8 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		//jButtonNRouteReset.setEnabled(enableReset);
 		
 		jCheckBoxKMLNorm.setEnabled(enableExport);
+		
+		jCheckBoxUniqueGPS.setEnabled(enableMatch);
 
 		// get caption of match button according to current match GPS/n route
 		// algorithm states
@@ -1249,6 +1261,16 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 	@Override
 	public boolean getKMLNorm() {
 		return jCheckBoxKMLNorm.isSelected();
+	}
+	
+	@Override
+	public void setUniqueGPS(boolean enable) {
+		jCheckBoxUniqueGPS.setSelected(enable);
+	}
+
+	@Override
+	public boolean getUniqueGPS() {
+		return jCheckBoxUniqueGPS.isSelected();
 	}
 
 	

@@ -308,7 +308,7 @@ public class JXMapMatchController implements ActionListener,
 				break;
 				
 			case "export N match":
-				saveMatchedGPSNodes(matchGPStoNRouteAlgorithm, jxMapMatchGUI.getKMLNorm());
+				saveMatchedGPSNodes(matchGPStoNRouteAlgorithm, jxMapMatchGUI.getKMLNorm(), jxMapMatchGUI.getUniqueGPS());
 				break;
 				
 			// user switch/turn off route selecting mode
@@ -318,7 +318,7 @@ public class JXMapMatchController implements ActionListener,
 				
 			// show save dialog for matched GPS points and export file
 			case "Export matched GPS Nodes to file":
-				saveMatchedGPSNodes(gpsToLinkMatcher, jxMapMatchGUI.getKMLNorm());
+				saveMatchedGPSNodes(gpsToLinkMatcher, jxMapMatchGUI.getKMLNorm(), jxMapMatchGUI.getUniqueGPS());
 				break;
 				
 			// user executes match to N route algorithm
@@ -722,7 +722,7 @@ public class JXMapMatchController implements ActionListener,
 		worker.execute();
 	}
 	
-	private void saveMatchedGPSNodes(final MatchingGPSObject matchingGPSObj, boolean kmlNorm) {
+	private void saveMatchedGPSNodes(final MatchingGPSObject matchingGPSObj, boolean kmlNorm, boolean onlyUniqueMatchedGPS) {
 		// if user choose an valid file
 		if (jFileSaveDialogMatchedGPS.showSaveDialog()){
 			
@@ -737,7 +737,7 @@ public class JXMapMatchController implements ActionListener,
 				@Override
 				protected Boolean doInBackground() throws Exception {
 					try {
-						GPSTraceStreamer.saveMatchedGPSTraceToFile(myMap, matchingGPSObj.getMatchedGPSNodes(), matchingGPSObj.getRefTimeStamp(), jxMapMatchGUI.getNormalizeGPSTimeStamp(), gpsTraceFile.getAbsolutePath(), jxMapMatchGUI, matchGPStoNRouteAlgorithm.getMatchedNLinks(), kmlNorm);
+						GPSTraceStreamer.saveMatchedGPSTraceToFile(myMap, matchingGPSObj.getMatchedGPSNodes(), matchingGPSObj.getRefTimeStamp(), jxMapMatchGUI.getNormalizeGPSTimeStamp(), gpsTraceFile.getAbsolutePath(), jxMapMatchGUI, matchGPStoNRouteAlgorithm.getMatchedNLinks(), kmlNorm, onlyUniqueMatchedGPS);
 					} catch (Exception e) { 
 						e.printStackTrace();
 						return false;

@@ -48,9 +48,9 @@ public class myDataset {
 		objCount++;		
 	}
 	
-	public static void matchMatchedGPSNode(Vector<myDataset> Datasets, boolean isDatasetDown, Vector<MatchedGPSNode> gpsNodesToMatch,  Vector<MatchedNLink> matchedNLinks, Vector<myCellInfo> CellInfos) {
+	public static void matchMatchedGPSNode(Vector<myDataset> Datasets, boolean isDatasetDown, Vector<MatchedGPSNode> gpsNodesToMatch,  Vector<MatchedNLink> matchedNLinks, Vector<myCellInfo> CellInfos, boolean onlyUniqueMatchedGPS) {
 		for (myDataset d : Datasets) {
-			d.match(gpsNodesToMatch, matchedNLinks, isDatasetDown, CellInfos);
+			d.match(gpsNodesToMatch, matchedNLinks, isDatasetDown, CellInfos, onlyUniqueMatchedGPS);
 		}
 
 		// set var for RouteDistribution
@@ -136,7 +136,7 @@ public class myDataset {
 
 	}
 	
-	public void match(Vector<MatchedGPSNode> gpsNodesToMatch,  Vector<MatchedNLink> matchedNLinks, boolean isDatasetDown, Vector<myCellInfo> CellInfos) {
+	public void match(Vector<MatchedGPSNode> gpsNodesToMatch,  Vector<MatchedNLink> matchedNLinks, boolean isDatasetDown, Vector<myCellInfo> CellInfos, boolean onlyUniqueMatchedGPS) {
 		
 		for (int i = CellInfos.size() - 1; i >= 0 ; i--) {
 			myCellInfo ci = CellInfos.get(i);
@@ -147,11 +147,20 @@ public class myDataset {
 		}
 		
 		MatchedGPSNode lastNode = null;
+		MatchedGPSNode lastNodeUnique = null;
 		for (int i = gpsNodesToMatch.size()-1; i >= 0; i--) {
 			MatchedGPSNode n = gpsNodesToMatch.get(i);
 			if (n.getTimestamp() <= this.getTimestamp()) {
-				lastNode = n;
-				break;
+				if (lastNode == null) {
+					lastNode = n;
+					if (onlyUniqueMatchedGPS == false) {
+						break;
+					}
+				}
+				if (n.isUniqueMatchedXY) {
+					lastNodeUnique = n;
+					break;
+				}
 			}
 		}
 
@@ -159,13 +168,27 @@ public class myDataset {
 			isMatched = false;
 			return;
 		}
+		
+		if (onlyUniqueMatchedGPS && lastNodeUnique == null) {
+			isMatched = false;
+			return;			
+		}
 
 		MatchedGPSNode nextNode = null;
+		MatchedGPSNode nextNodeUnique = null;
 		for (int i = 0; i < gpsNodesToMatch.size(); i++) {
 			MatchedGPSNode n = gpsNodesToMatch.get(i);
 			if (this.getTimestamp() <= n.getTimestamp()) {
-				nextNode = n;
-				break;
+				if (nextNode == null) {
+					nextNode = n;
+					if (onlyUniqueMatchedGPS == false) {
+						break;
+					}
+				}
+				if (n.isUniqueMatchedXY) {
+					nextNodeUnique = n;
+					break;
+				}
 			}
 		}
 		
@@ -173,29 +196,60 @@ public class myDataset {
 			isMatched = false;
 			return;
 		}
+		
+		if (onlyUniqueMatchedGPS && nextNodeUnique == null) {
+			isMatched = false;
+			return;			
+		}
 
-		double timeTotal = nextNode.getTimestamp() - lastNode.getTimestamp();
-		double timeNode = this.getTimestamp() - lastNode.getTimestamp();
-		double timeDistribution = timeNode / timeTotal;
-		double lenPosTotal;
-		if (nextNode.isReordered) {
-			lenPosTotal = nextNode.lengthPosReordered;
+		if (onlyUniqueMatchedGPS) {
+			double timeTotal = nextNodeUnique.getTimestamp() - lastNodeUnique.getTimestamp();
+			double timeNode = this.getTimestamp() - lastNodeUnique.getTimestamp();
+			double timeDistribution = timeNode / timeTotal;
+			double lenPosTotal;
+			if (nextNodeUnique.isReordered) {
+				lenPosTotal = nextNodeUnique.lengthPosReordered;
+			} else {
+				lenPosTotal = nextNodeUnique.lengthPos;
+			}
+			if (lastNodeUnique.isReordered) {
+				lenPosTotal -= lastNodeUnique.lengthPosReordered;
+			} else {
+				lenPosTotal -= lastNodeUnique.lengthPos;
+			}
+			
+			this.lengthPos = lenPosTotal * timeDistribution;
+			
+			if (lastNodeUnique.isReordered) {
+				this.lengthPos += lastNodeUnique.lengthPosReordered;
+			} else {
+				this.lengthPos += lastNodeUnique.lengthPos;
+			}
 		} else {
-			lenPosTotal = nextNode.lengthPos;
-		}
-		if (lastNode.isReordered) {
-			lenPosTotal -= lastNode.lengthPosReordered;
-		} else {
-			lenPosTotal -= lastNode.lengthPos;
+			double timeTotal = nextNode.getTimestamp() - lastNode.getTimestamp();
+			double timeNode = this.getTimestamp() - lastNode.getTimestamp();
+			double timeDistribution = timeNode / timeTotal;
+			double lenPosTotal;
+			if (nextNode.isReordered) {
+				lenPosTotal = nextNode.lengthPosReordered;
+			} else {
+				lenPosTotal = nextNode.lengthPos;
+			}
+			if (lastNode.isReordered) {
+				lenPosTotal -= lastNode.lengthPosReordered;
+			} else {
+				lenPosTotal -= lastNode.lengthPos;
+			}
+			
+			this.lengthPos = lenPosTotal * timeDistribution;
+			
+			if (lastNode.isReordered) {
+				this.lengthPos += lastNode.lengthPosReordered;
+			} else {
+				this.lengthPos += lastNode.lengthPos;
+			}
 		}
 		
-		this.lengthPos = lenPosTotal * timeDistribution;
-		
-		if (lastNode.isReordered) {
-			this.lengthPos += lastNode.lengthPosReordered;
-		} else {
-			this.lengthPos += lastNode.lengthPos;
-		}
 
 		for (MatchedNLink link : matchedNLinks) {
 			if (link.lengthPosStart <= this.lengthPos && this.lengthPos <= link.lengthPosEnd) {
@@ -219,12 +273,16 @@ public class myDataset {
 		this.matched_distribution_in_WayPart = lengthPosInLink / this.matchedNLink.getStreetLink().length;
 
 		// set X Y unmatched
+		double timeTotal = nextNode.getTimestamp() - lastNode.getTimestamp();
+		double timeNode = this.getTimestamp() - lastNode.getTimestamp();
+		double timeDistribution = timeNode / timeTotal;
+		
 		double xLen = nextNode.getX() - lastNode.getX();
 		xLen = xLen * timeDistribution;	
 		this.Xunmatched = lastNode.getX() + xLen;
 		double yLen = nextNode.getY() - lastNode.getY();
 		yLen = yLen * timeDistribution;	
-		this.Yunmatched = lastNode.getY() + yLen;
+		this.Yunmatched = lastNode.getY() + yLen;			
 		
 		// set X Y matched
 		xLen = this.matchedNLink.getStreetLink().endNode.x - this.matchedNLink.getStreetLink().startNode.x;

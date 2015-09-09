@@ -200,7 +200,36 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 			
 		}
 		
+		for (int i=0; i < (reorderedMatchedGPSNodes.size() - 1); i++) {
+			
+			MatchedGPSNode n1 = reorderedMatchedGPSNodes.get(i);
+			MatchedGPSNode n2 = reorderedMatchedGPSNodes.get(i+1);
 
+			double x1, y1;
+			if (n1.isReordered) {
+				x1 = n1.matchedXreordered;
+				y1 = n1.matchedYreordered;
+			} else {
+				x1 = n1.matchedX;
+				y1 = n1.matchedY;
+			}
+			
+			double x2, y2;
+			if (n1.isReordered) {
+				x2 = n2.matchedXreordered;
+				y2 = n2.matchedYreordered;
+			} else {
+				x2 = n2.matchedX;
+				y2 = n2.matchedY;
+			}
+			
+			if (x1 == x2 && y1 == y2) {
+				n1.isUniqueMatchedXY = false;
+				n2.isUniqueMatchedXY = false;
+			}
+			
+		}
+		
 
 	}
 

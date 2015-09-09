@@ -2147,12 +2147,12 @@ public class GPSTraceStreamer {
 	 * @return was writing progress successful?
 	 */
 	public static boolean saveMatchedGPSTraceToFile(myOSMMap myMap, Vector<MatchedGPSNode> gpsNodesToMatch, long refTimeStamp,
-			boolean normalizeTimeStamp, String filePath, StatusUpdate statusUpdate, Vector<MatchedNLink> matchedNLinks, boolean kmlNorm) {
+			boolean normalizeTimeStamp, String filePath, StatusUpdate statusUpdate, Vector<MatchedNLink> matchedNLinks, boolean kmlNorm, boolean onlyUniqueMatchedGPS) {
 
 		MatchedNLink.reorderMatchedGPSNodes(matchedNLinks, gpsNodesToMatch);
 
-		myDataset.matchMatchedGPSNode(myMap.DatasetsDown, true, gpsNodesToMatch, matchedNLinks, myMap.CellInfos);
-		myDataset.matchMatchedGPSNode(myMap.DatasetsUp, false, gpsNodesToMatch, matchedNLinks, myMap.CellInfos);
+		myDataset.matchMatchedGPSNode(myMap.DatasetsDown, true, gpsNodesToMatch, matchedNLinks, myMap.CellInfos, onlyUniqueMatchedGPS);
+		myDataset.matchMatchedGPSNode(myMap.DatasetsUp, false, gpsNodesToMatch, matchedNLinks, myMap.CellInfos, onlyUniqueMatchedGPS);
 
 		// finished
 		statusUpdate.finished(" saved datasets to " + filePath);

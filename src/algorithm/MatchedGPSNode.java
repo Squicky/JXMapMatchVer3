@@ -40,6 +40,8 @@ public class MatchedGPSNode extends GPSNode {
 	
 	MatchedNLink matchedNLink = null;
 	
+	public boolean isUniqueMatchedXY = true;
+	
 	public MatchedGPSNode(GPSNode gpsNode, Color color) {
 		super(gpsNode.getX(), gpsNode.getY(), gpsNode.getTimestamp(), gpsNode.getLon(), gpsNode.getLat());
 		this.initColor = color;
