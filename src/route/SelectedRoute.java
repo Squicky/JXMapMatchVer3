@@ -2,9 +2,10 @@ package route;
 
 import java.util.NoSuchElementException;
 import java.util.Vector;
-import myOSM.myOSMMap;
-import myOSM.myOSMNode;
-import myOSM.myOSMWayPart;
+
+import myClasses.myOSMMap;
+import myClasses.myOSMNode;
+import myClasses.myOSMWayPart;
 import cartesian.Coordinates;
 
 /**

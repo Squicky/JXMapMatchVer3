@@ -4,17 +4,20 @@
 
 package graphic;
 
-import myOSM.myOSMMap;
-import myOSM.myOSMNode;
-import myOSM.myOSMWay;
-import myOSM.myOSMWayPart;
+import myClasses.myOSMMap;
+import myClasses.myOSMNode;
+import myClasses.myOSMWay;
+import myClasses.myOSMWayPart;
+
 import org.jdesktop.swingx.*;
+
 import algorithm.MatchedGPSNode;
 import algorithm.MatchedLink;
 import algorithm.MatchedNLink;
 import algorithm.ReorderedMatchedGPSNode;
 import route.*;
 import gps.GPSTrace;
+
 import java.awt.*;
 import java.util.Vector;
 

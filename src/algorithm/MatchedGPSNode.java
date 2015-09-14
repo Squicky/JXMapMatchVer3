@@ -4,7 +4,7 @@ import gps.GPSNode;
 
 import java.awt.Color;
 
-import myOSM.myOSMWayPart;
+import myClasses.myOSMWayPart;
 
 public class MatchedGPSNode extends GPSNode {
 	

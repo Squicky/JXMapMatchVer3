@@ -1,4 +1,4 @@
-package myOSM;
+package myClasses;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -1,16 +1,18 @@
 package algorithm;
 
 import interfaces.StatusUpdate;
+
 import java.awt.Component;
 import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.Vector;
+
 import cartesian.Coordinates;
 import gps.GPSNode;
 import gps.GPSTrace;
-import myOSM.myOSMMap;
-import myOSM.myOSMWay;
-import myOSM.myOSMWayPart;
+import myClasses.myOSMMap;
+import myClasses.myOSMWay;
+import myClasses.myOSMWayPart;
 import route.NRoute;
 
 /**

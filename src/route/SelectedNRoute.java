@@ -3,11 +3,14 @@ package route;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Vector;
+
 import logging.Logger;
-import myOSM.myOSMMap;
-import myOSM.myOSMNode;
-import myOSM.myOSMWayPart;
+import myClasses.myOSMMap;
+import myClasses.myOSMNode;
+import myClasses.myOSMWayPart;
+
 import org.jdesktop.swingx.mapviewer.GeoPosition;
+
 import algorithm.MatchedLink;
 import algorithm.NRouteAlgorithm;
 import cartesian.Coordinates;

@@ -6,9 +6,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.SwingWorker;
-import myOSM.myOSMMap;
-import myOSM.myOSMWayPart;
+
+import myClasses.myOSMMap;
+import myClasses.myOSMWayPart;
 import cartesian.Coordinates;
 import route.SelectedRoute;
 import gps.GPSNode;

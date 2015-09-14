@@ -1,6 +1,6 @@
 package algorithm;
 
-import myOSM.myOSMWayPart;
+import myClasses.myOSMWayPart;
 
 /**
  * @author Daniel Sathees Elmo

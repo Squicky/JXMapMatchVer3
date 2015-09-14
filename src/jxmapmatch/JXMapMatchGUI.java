@@ -464,7 +464,7 @@ public class JXMapMatchGUI extends JFrame implements JXMapMatchGUIInterface {
 		this.setKMLNorm(true);
 		jCheckBoxKMLNorm.setAlignmentX(CENTER_ALIGNMENT);
 		
-		jCheckBoxUniqueGPS = new JCheckBox("Unique");
+		jCheckBoxUniqueGPS = new JCheckBox("Unique GPS");
 		jCheckBoxUniqueGPS.setToolTipText("different matched neighboring measured value");
 		setUniqueGPS(true);
 		jCheckBoxUniqueGPS.setAlignmentX(CENTER_ALIGNMENT);

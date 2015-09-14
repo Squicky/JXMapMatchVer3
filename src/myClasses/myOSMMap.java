@@ -1,4 +1,4 @@
-package myOSM;
+package myClasses;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -405,11 +405,13 @@ public class myOSMMap {
 			
 		} else {
 			
-			if (this.parseXML_status != 3) {
-				tempWay.setMeansOfTransport();				
+			boolean useOsmParserFile = true;
+			
+			if (useOsmParserFile == false) {
+				tempWay.setMeansOfTransport();
 			}
 			
-			if (this.parseXML_status == 3 || tempWay.getMeansOfTransportPermission(myOSMWay.CAR)) {
+			if (useOsmParserFile || tempWay.getMeansOfTransportPermission(myOSMWay.CAR)) {
 				
 				anzahl_ways_Car++;
 

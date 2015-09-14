@@ -1,4 +1,4 @@
-package myOSM;
+package myClasses;
 
 import java.util.HashMap;
 import java.util.Map;

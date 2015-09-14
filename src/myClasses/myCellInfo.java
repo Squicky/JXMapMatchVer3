@@ -1,4 +1,4 @@
-package myOSM;
+package myClasses;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -261,18 +261,6 @@ public class myCellInfo {
 
 						ci.g1_cellid = lines[3].trim();
 						ci.g1_lac = lines[2].trim();
-
-						/*
-						ci.m1_mmc = lines[0].trim();
-						ci.m1_mnc = lines[1].trim();
-						ci.m1_lac = lines[2].trim();
-						ci.m1_cellid = lines[3].trim();
-						ci.m1_bsic = lines[4].trim();
-						ci.m1_ch = lines[5].trim();
-						ci.m1_rxl = lines[6].trim();
-						ci.m1_c1 = lines[7].trim();
-						ci.m1_c2 = lines[8].trim();
-						*/
 						
 					} else if (line.equals(" MCC, MNC,  LAC,   Ch,  SC, RSCP, EcNo, RSSI, ServL, ServQ, Hs, Rs")) {
 						line = bReader.readLine();
@@ -286,62 +274,6 @@ public class myCellInfo {
 							ci.w1_ch = lines[3].trim();
 							ci.w1_sc = lines[4].trim();
 							
-							/*
-							ci.w1_mcc = lines[0].trim();
-							ci.w1_mnc = lines[1].trim();
-							ci.w1_lac = lines[2].trim();
-							ci.w1_ch = lines[3].trim();
-							ci.w1_sc = lines[4].trim();
-							ci.w1_rscp = lines[5].trim();
-							ci.w1_ecno = lines[6].trim();
-							ci.w1_rssi = lines[7].trim();
-							ci.w1_servl = lines[8].trim();
-							ci.w1_servq = lines[9].trim();
-							ci.w1_hs = lines[10].trim();
-							ci.w1_rs = lines[11].trim();
-							*/
-							
-							/*
-							line = bReader.readLine();
-							if (line.equals("") == false) {
-								lines = line.split(",");
-								
-								
-								ci.w1_mcc = lines[0].trim();
-								ci.w1_mnc = lines[1].trim();
-								ci.w1_lac = lines[2].trim();
-								ci.w1_ch = lines[3].trim();
-								ci.w1_sc = lines[4].trim();
-								ci.w1_rscp = lines[5].trim();
-								ci.w1_ecno = lines[6].trim();
-								ci.w1_rssi = lines[7].trim();
-								ci.w1_servl = lines[8].trim();
-								ci.w1_servq = lines[9].trim();
-								ci.w1_hs = lines[10].trim();
-								ci.w1_rs = lines[11].trim();
-								
-								
-								line = bReader.readLine();
-								if (line.equals("") == false) {
-									lines = line.split(",");
-									
-									
-									ci.w1_mcc = lines[0].trim();
-									ci.w1_mnc = lines[1].trim();
-									ci.w1_lac = lines[2].trim();
-									ci.w1_ch = lines[3].trim();
-									ci.w1_sc = lines[4].trim();
-									ci.w1_rscp = lines[5].trim();
-									ci.w1_ecno = lines[6].trim();
-									ci.w1_rssi = lines[7].trim();
-									ci.w1_servl = lines[8].trim();
-									ci.w1_servq = lines[9].trim();
-									ci.w1_hs = lines[10].trim();
-									ci.w1_rs = lines[11].trim();
-									
-								}
-							}
-							*/
 						}
 					} else if (line.startsWith("*EWSCI: ")) {
 						line = line.replace("*EWSCI: ", "");

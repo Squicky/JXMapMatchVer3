@@ -1,4 +1,4 @@
-package myOSM;
+package myClasses;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -367,7 +367,7 @@ public class myDataset {
 					
 				}
 				
-				datasets = loadDatasetsUp(bReader, columnNrDataRate, columnNrDelay, columnNrTimestamp, columnNrLossRate);
+				datasets = loadDatasets(bReader, columnNrDataRate, columnNrDelay, columnNrTimestamp, columnNrLossRate);
 				
 			}
 			
@@ -426,7 +426,7 @@ public class myDataset {
 					
 				}
 				
-				datasets = loadDatasetsUp(bReader, columnNrDataRate, columnNrDelay, columnNrTimestamp, columnNrLossRate);
+				datasets = loadDatasets(bReader, columnNrDataRate, columnNrDelay, columnNrTimestamp, columnNrLossRate);
 				
 			}
 			
@@ -442,7 +442,7 @@ public class myDataset {
 		
 	}
 	
-	private static Vector<myDataset> loadDatasetsUp(BufferedReader bReader, int columnNrDataRate, int columnNrDelay, int columnNrTimestamp, int columnNrLossRate) {
+	private static Vector<myDataset> loadDatasets(BufferedReader bReader, int columnNrDataRate, int columnNrDelay, int columnNrTimestamp, int columnNrLossRate) {
 		
 		Vector<myDataset> datasets = new Vector<myDataset>();
 		

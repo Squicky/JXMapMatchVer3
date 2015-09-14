@@ -2,9 +2,10 @@ package route;
 
 import java.util.LinkedList;
 import java.util.Vector;
+
 import algorithm.MatchedLink;
-import myOSM.myOSMNode;
-import myOSM.myOSMWayPart;
+import myClasses.myOSMNode;
+import myClasses.myOSMWayPart;
 import cartesian.Coordinates;
 import gps.GPSNode;
 import gps.GPSTrace;

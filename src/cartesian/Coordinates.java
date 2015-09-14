@@ -8,12 +8,15 @@
 
 package cartesian;
 
-import myOSM.myOSMNode;
-import myOSM.myOSMWayPart;
+import myClasses.myOSMNode;
+import myClasses.myOSMWayPart;
+
 import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.mapviewer.*;
+
 import algorithm.MatchedPoint;
 import gps.GPSNode;
+
 import java.awt.geom.Point2D;
 
 /**

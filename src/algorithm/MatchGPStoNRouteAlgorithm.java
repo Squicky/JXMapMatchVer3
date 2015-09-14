@@ -2,10 +2,12 @@ package algorithm;
 
 import interfaces.MatchingGPSObject;
 import interfaces.StatusUpdate;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.util.Vector;
-import myOSM.myOSMWayPart;
+
+import myClasses.myOSMWayPart;
 import cartesian.Coordinates;
 import gps.GPSNode;
 import gps.GPSTrace;
@@ -24,29 +26,18 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 	public static final String MATCH_GPS_TO_N_ROUTE_PAUSED = "PAUSED";
 	public static final String MATCH_GPS_TO_N_ROUTE_RECESSED = "RECESSED";
 
-	// time in ms thread should sleep after one GPS point is matched
-	// private static final int DEFAULT_THREAD_SLEEP_TIME = 10;
-
-	// animation
-	//private static final int COLOR_GRADIENT_STEPS = 10;
-	//private static final long SLEEP_ANIMATION = 0;
-
-	//private Color gpsNodeColorGradient[]; // store different colors which create
-											// an color gradient
-	//private Color nLinkColorGradient[]; // store different colors which create
-										// an color gradient
-
 	// private SelectedNRoute selectedNRoute;
 	// private GPSTrace gpsTrace;
 	private long refTimeStamp; // timestamp where measurement started
 
-	Vector<ReorderedMatchedGPSNode> reorderedMatchedGPSNodes = new Vector<>();
-	Vector<MatchedNLink> matchedNLinks = new Vector<>();
+	// Used class ReorderedMatchedGPSNode is incorrect: 
+	// GPSNodes are NOT reordered !
+	// relic of JXMapMatchVer2
+	private Vector<ReorderedMatchedGPSNode> GPSNodes = new Vector<>();
+	private Vector<MatchedNLink> matchedNLinks = new Vector<>();
 
 	private Color unmatchedLinkColor;
 	private Color unmatchedNodeColor;
-
-	//private Component drawComponent;
 
 	// save current algorithm state here
 	private String matchGPStoNRouteAlgorithmState;
@@ -67,11 +58,7 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 
 		// wrap selected n route & GPS trace for matching/drawing
 		this.matchedNLinks = wrapSelectedNRoute(selectedNRoute);
-		this.reorderedMatchedGPSNodes = wrapSelectedGPSTrace(gpsTrace);
-
-		// create color gradients between two color with a number of steps
-		//nLinkColorGradient = getColorGradient(unmatchedLinkColor, matchedLinkColor, COLOR_GRADIENT_STEPS);
-		//gpsNodeColorGradient = getColorGradient(unmatchedNodeColor, matchedNodeColor, COLOR_GRADIENT_STEPS);
+		this.GPSNodes = wrapSelectedGPSTrace(gpsTrace);
 
 		matchGPStoNRouteAlgorithmState = MATCH_GPS_TO_N_ROUTE_RECESSED;
 	}
@@ -110,15 +97,13 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 			} else {
 				CountCheckNext = bestCountCheckNext;
 			}			
-
-			for (MatchedGPSNode matchedGPSNode : reorderedMatchedGPSNodes) {
+			
+			for (MatchedGPSNode matchedGPSNode : GPSNodes) {
 
 				currentMatchedNLink = matchedNLinks.get(currentNLinkIndex);
 				nearestMatchedNLink = currentMatchedNLink;
 
 				myOSMWayPart curWP = currentMatchedNLink.getStreetLink();
-				//long curWPOsmID = curWP.parentWay.id;
-				//long nextWPOsmID = 0;
 
 				double disToCur = Coordinates.getDistance(matchedGPSNode, curWP);
 
@@ -148,40 +133,11 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 
 				currentNLinkIndex = IndexOfdisToNearest;
 
-				/*
-				while (disToNearest < disToCur && currentNLinkIndex != IndexOfdisToNearest) {
-
-					currentNLinkIndex = IndexOfdisToNearest;
-					
-					if (currentNLinkIndex == 196 || currentNLinkIndex == 202 ) {
-						currentNLinkIndex++;
-						currentNLinkIndex--;
-					}
-					
-					disToCur = disToNearest;
-
-					for (int i = 0; i < CountCheckNext; i++) {
-						if ((currentNLinkIndex + 1 + i) <= maxIndex) {
-
-							double disToNextTemp = Coordinates.getDistance(matchedGPSNode,
-									matchedNLinks.get(currentNLinkIndex + 1 + i).getStreetLink());
-
-							if (disToNextTemp < disToNearest) {
-								disToNearest = disToNextTemp;
-								IndexOfdisToNearest = currentNLinkIndex + 1 + i;
-							}
-						}
-					}
-				}
-				*/
-
 				if (statusSearchBestCountCheckNext == 1) {
 					matchGPSNodeToNLink(nearestMatchedNLink, matchedGPSNode, currentNodeIndex);					
 				}
 
 				tempDistanceofAllGPSNode += disToNearest;
-
-				// animateCurrentLink(matchedNLinks.get(IndexOfdisToNearest));
 
 				// increase node index
 				currentNodeIndex++;
@@ -200,10 +156,10 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 			
 		}
 		
-		for (int i=0; i < (reorderedMatchedGPSNodes.size() - 1); i++) {
+		for (int i=0; i < (GPSNodes.size() - 1); i++) {
 			
-			MatchedGPSNode n1 = reorderedMatchedGPSNodes.get(i);
-			MatchedGPSNode n2 = reorderedMatchedGPSNodes.get(i+1);
+			MatchedGPSNode n1 = GPSNodes.get(i);
+			MatchedGPSNode n2 = GPSNodes.get(i+1);
 
 			double x1, y1;
 			if (n1.isReordered) {
@@ -233,140 +189,7 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 
 	}
 
-	/*
-	 * private void applyAdditionalFeature(MatchedNLink currentMatchedNLink, int
-	 * startingNode) {
-	 * 
-	 * Logger.println("\napply addition feature:\n=============================")
-	 * ;
-	 * 
-	 * Vector<ShareIndex> shareIndexList = new Vector<>();
-	 * 
-	 * // create artificial link which is build of first and last GPS node from
-	 * matched N link ReorderedMatchedGPSNode gpsNodeStart =
-	 * reorderedMatchedGPSNodes.get(currentMatchedNLink.getRangeStartIndex());
-	 * ReorderedMatchedGPSNode gpsNodeEnd =
-	 * reorderedMatchedGPSNodes.get(currentMatchedNLink.getRangeEndIndex());
-	 * myOSMNode startNode = new myOSMNode(gpsNodeStart.getX(),
-	 * gpsNodeStart.getY(), -2); myOSMNode endNode = new
-	 * myOSMNode(gpsNodeEnd.getX(), gpsNodeEnd.getY(), -2); myOSMWayPart artLink
-	 * = new myOSMWayPart(startNode, endNode, -3, startNode.id, endNode.id);
-	 * double artLinkLength = artLink.getLength();
-	 * Logger.println("artificial Link length: " + artLinkLength);
-	 * 
-	 * // match points to artificial link for (int
-	 * i=currentMatchedNLink.getRangeStartIndex(); i <=
-	 * currentMatchedNLink.getRangeEndIndex(); i++) {
-	 * 
-	 * // get corresponding GPS node ReorderedMatchedGPSNode matchedGPSNode =
-	 * reorderedMatchedGPSNodes.get(i);
-	 * 
-	 * // get matched position on artificial link double matchedX =
-	 * Coordinates.getNearestPointX(matchedGPSNode, artLink); double matchedY =
-	 * Coordinates.getNearestPointY(matchedGPSNode, artLink);
-	 * 
-	 * // build share link from artificial link start node until matched
-	 * position myOSMNode shareStartNode = new myOSMNode (artLink.getStartX(),
-	 * artLink.getStartY(), artLink.xmyid); myOSMNode shareEndNode = new
-	 * myOSMNode (matchedX, matchedY, -4); myOSMWayPart shareLink = new
-	 * myOSMWayPart(shareStartNode, shareEndNode, -4, shareStartNode.id,
-	 * shareEndNode.id);
-	 * 
-	 * // get share, avoid null division double share = (artLinkLength != 0.0f)
-	 * ? shareLink.getLength() / artLinkLength : 0.0f ;
-	 * 
-	 * // save share, index and current matched position shareIndexList.add(new
-	 * ShareIndex(share, i, matchedGPSNode.getMatchedX(),
-	 * matchedGPSNode.getMatchedY()));
-	 * 
-	 * Logger.println("Share: " + share + "\t\tIndex: " + i); }
-	 * 
-	 * // reorder/sort if (useReorder) { Collections.sort(shareIndexList);
-	 * 
-	 * Logger.println("Sorted:\n===========)"); int compareIndex =
-	 * currentMatchedNLink.getRangeStartIndex(); for (ShareIndex sI :
-	 * shareIndexList) {
-	 * 
-	 * // set previous and current index ReorderedMatchedGPSNode matchedGPSNode
-	 * = reorderedMatchedGPSNodes.get(compareIndex);
-	 * matchedGPSNode.setPrevIndex(compareIndex);
-	 * matchedGPSNode.setCurIndex(sI.getIndex());
-	 * matchedGPSNode.setMatchedX(sI.getMatchedX());
-	 * matchedGPSNode.setMatchedY(sI.getMatchedY());
-	 * 
-	 * Logger.print("Share: " + sI.getShare() + "\t\tIndex: " + sI.getIndex());
-	 * if ((compareIndex) != sI.getIndex()) { Logger.print(" Reordered! Prev: "
-	 * + compareIndex + " Cur: " + sI.getIndex()); } Logger.print("\n");
-	 * compareIndex++; } }
-	 * 
-	 * // projection/matching if (useProject) {
-	 * 
-	 * // get matched link as link //myOSMWayPart curLink =
-	 * currentMatchedNLink.getStreetLink(); double curLinkStartX = 0; //
-	 * (startingNode == StreetLink.START_NODE) ? curLink.getStartX() :
-	 * curLink.getEndX(); double curLinkStartY = 0; // (startingNode ==
-	 * StreetLink.START_NODE) ? curLink.getStartY() : curLink.getEndY(); double
-	 * curLinkEndX = 0; // (startingNode == StreetLink.START_NODE) ?
-	 * curLink.getEndX() : curLink.getStartX(); double curLinkEndY = 0; //
-	 * (startingNode == StreetLink.START_NODE) ? curLink.getEndY() :
-	 * curLink.getStartY();
-	 * 
-	 * double curLinkVecX = curLinkEndX - curLinkStartX; double curLinkVecY =
-	 * curLinkEndY - curLinkStartY;
-	 * 
-	 * // match nodes according to share int nodeIndex =
-	 * currentMatchedNLink.getRangeStartIndex(); for (ShareIndex sI :
-	 * shareIndexList) {
-	 * 
-	 * //double shareIndex = (shareIndexList.size() == 1) ? 0.5f :
-	 * sI.getShare();
-	 * 
-	 * // get matched position double matchedX = (curLinkStartX + sI.getShare()
-	 * * curLinkVecX); double matchedY = (curLinkStartY + sI.getShare() *
-	 * curLinkVecY);
-	 * 
-	 * // write value to matched GPS node ReorderedMatchedGPSNode matchedGPSNode
-	 * = reorderedMatchedGPSNodes.get(nodeIndex);
-	 * matchedGPSNode.setMatchedX(matchedX);
-	 * matchedGPSNode.setMatchedY(matchedY); nodeIndex++; }
-	 * 
-	 * }
-	 * 
-	 * }
-	 */
-
-	// private void matchGPSNodeToNLink(MatchedNLink matchedNLink,
-	// MatchedGPSNode matchedGPSNode, int nodeIndex) {
-	//
-	// Logger.print("matching GPS node: " + nodeIndex + "\n" +
-	// "----------------------------------------" + "\n");
-	//
-	// // get matched position on link
-	// int matchedX = Coordinates.getNearestPointX(matchedGPSNode.getNode(),
-	// matchedNLink.getStreetLink());
-	// int matchedY = Coordinates.getNearestPointY(matchedGPSNode.getNode(),
-	// matchedNLink.getStreetLink());
-	//
-	// // set matched position to GPS node
-	// matchedGPSNode.setMatchedX(matchedX);
-	// matchedGPSNode.setMatchedY(matchedY);
-	//
-	// // adjust matching range
-	// if (matchedNLink.isMatched()) {
-	// matchedNLink.setRangeEndIndex(nodeIndex);
-	// }
-	// // first node to match, so set start index
-	// else {
-	// matchedNLink.setRangeStartIndex(nodeIndex);
-	// matchedNLink.setRangeEndIndex(nodeIndex);
-	// matchedNLink.setMatched(true);
-	// }
-	// }
-
 	private void matchGPSNodeToNLink(MatchedNLink matchedNLink, MatchedGPSNode matchedGPSNode, int nodeIndex) {
-
-		// Logger.print("matching GPS node: " + nodeIndex + "\n" +
-		// "----------------------------------------" + "\n");
 
 		// get matched position on link
 		myOSMWayPart wp = matchedNLink.getStreetLink();
@@ -397,46 +220,6 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 			matchedNLink.setMatched(true);
 		}
 	}
-
-	/*
-	 * private void animateCurrentLink(MatchedNLink matchedNLink) {
-	 * 
-	 * //Logger.println("\nanimate current link: " +
-	 * matchedNLink.getRangeStartIndex() + " - " +
-	 * matchedNLink.getRangeEndIndex() + "\n");
-	 * 
-	 * //animate for (int i=0; i < COLOR_GRADIENT_STEPS; i++){
-	 * 
-	 * i = COLOR_GRADIENT_STEPS - 1;
-	 * 
-	 * //sleep this thread due to create an animation try {
-	 * Thread.sleep(SLEEP_ANIMATION); } catch (InterruptedException e) { ; }
-	 * 
-	 * //moving vector factor double f=i/(double) COLOR_GRADIENT_STEPS;
-	 * 
-	 * //gradual move matched GPS node from original GPS position to matched
-	 * position for (int j=matchedNLink.getRangeStartIndex();
-	 * j<=matchedNLink.getRangeEndIndex(); j++){
-	 * 
-	 * j = matchedNLink.getRangeEndIndex();
-	 * 
-	 * // get matched GPS node MatchedGPSNode matchedGPSNode =
-	 * reorderedMatchedGPSNodes.get(j);
-	 * 
-	 * //get next position of GPS nodes double nextX = (matchedGPSNode.getX() +
-	 * (f*(matchedGPSNode.getMatchedX() - matchedGPSNode.getX()))); double nextY
-	 * = (matchedGPSNode.getY() + (f*(matchedGPSNode.getMatchedY() -
-	 * matchedGPSNode.getY())));
-	 * 
-	 * //set calculated color and moved position as next position to draw
-	 * matchedGPSNode.setDrawX(nextX); matchedGPSNode.setDrawY(nextY);
-	 * matchedGPSNode.setColor(gpsNodeColorGradient[i]);
-	 * 
-	 * // set calculated color for n Link
-	 * matchedNLink.setColor(nLinkColorGradient[i]); }
-	 * 
-	 * //redraw moved GPS nodes drawComponent.repaint(); } }
-	 */
 
 	private Vector<ReorderedMatchedGPSNode> wrapSelectedGPSTrace(GPSTrace gpsTrace) {
 
@@ -472,7 +255,7 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 	}
 
 	public Vector<ReorderedMatchedGPSNode> getReorderedMatchedGPSNodes() {
-		return reorderedMatchedGPSNodes;
+		return GPSNodes;
 	}
 
 	public Vector<MatchedNLink> getMatchedNLinks() {
@@ -497,110 +280,6 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 		return matchGPStoNRouteAlgorithmState;
 	}
 
-	/*
-	 * private boolean sleepThread(long milliseconds) { // Thread sleep for
-	 * animation and refresh painting do { try { Thread.sleep(milliseconds); }
-	 * catch (InterruptedException e) { e.printStackTrace();}
-	 * drawComponent.repaint(); } while (getMatchGPStoNRouteAlgorithmState() ==
-	 * MATCH_GPS_TO_N_ROUTE_PAUSED);
-	 * 
-	 * // check if algorithm should be continued or shut down return
-	 * (getMatchGPStoNRouteAlgorithmState() == MATCH_GPS_TO_N_ROUTE_RUNNING) ?
-	 * true : false; }
-	 */
-
-	/**
-	 * create a color gradient between startColor and targetColor with given
-	 * steps
-	 * 
-	 * @param startColor
-	 * @param targetColor
-	 * @param steps
-	 * @return Color[]
-	 */
-	/*
-	private Color[] getColorGradient(Color startColor, Color targetColor, int steps) {
-		// save color gradient into array
-		Color[] colors = new Color[steps];
-
-		// save r, g, b values of start color
-		int startColorRed = startColor.getRed();
-		int startColorGreen = startColor.getGreen();
-		int startColorBlue = startColor.getBlue();
-
-		// save r, g, b values of end color
-		int targetColorRed = targetColor.getRed();
-		int targetColorGreen = targetColor.getGreen();
-		int targetColorBlue = targetColor.getBlue();
-
-		// calculate step interval for reaching target color by every step
-		int stepRed = (int) ((targetColorRed - startColorRed) / (double) steps);
-		int stepGreen = (int) ((targetColorGreen - startColorGreen) / (double) steps);
-		int stepBlue = (int) ((targetColorBlue - startColorBlue) / (double) steps);
-
-		// create colors for gradient and save to an color array
-		for (int i = 0; i < steps; i++) {
-			colors[i] = new Color(startColorRed + (int) (i * stepRed), startColorGreen + (int) (i * stepGreen),
-					startColorBlue + (int) (i * stepBlue));
-		}
-
-		// return this array
-		return colors;
-	}
-*/
-	
-	/**
-	 * subclass which stores a GPS node position-share of a whole link and it's
-	 * index
-	 */
-	/*
-	 * private class ShareIndex implements Comparable<ShareIndex> {
-	 * 
-	 * private double share; private int index; private double matchedX; private
-	 * double matchedY;
-	 * 
-	 * 
-	 * ShareIndex(double share, int index, double matchedX, double matchedY) {
-	 * this.share = share; this.index = index; }
-	 * 
-	 * 
-	 * 
-	 * public double getMatchedX() { return matchedX; }
-	 * 
-	 * 
-	 * 
-	 * public void setMatchedX(int matchedX) { this.matchedX = matchedX; }
-	 * 
-	 * 
-	 * 
-	 * 
-	 * public double getMatchedY() { return matchedY; }
-	 * 
-	 * 
-	 * 
-	 * public void setMatchedY(int matchedY) { this.matchedY = matchedY; }
-	 * 
-	 * 
-	 * 
-	 * 
-	 * public double getShare() { return share; }
-	 * 
-	 * 
-	 * public void setShare(double share) { this.share = share; }
-	 * 
-	 * 
-	 * public int getIndex() { return index; }
-	 * 
-	 * 
-	 * public void setIndex(int index) { this.index = index; }
-	 * 
-	 * 
-	 * @Override public int compareTo(ShareIndex o) { double diff = getShare() -
-	 * o.getShare(); // if share value of this object - share value of o... //
-	 * ... = 0 => equal position // ... < 0 => put o behind this object // ... >
-	 * 0 => put this object behind o return (diff == 0.0f) ? 0 : (diff > 0.0f) ?
-	 * 1 : -1; } }
-	 */
 
 	@Override
 	public long getRefTimeStamp() {
@@ -611,7 +290,7 @@ public class MatchGPStoNRouteAlgorithm implements MatchingGPSObject {
 	public Vector<MatchedGPSNode> getMatchedGPSNodes() {
 		// convert vector
 		Vector<MatchedGPSNode> matchedGPSNodes = new Vector<>();
-		for (ReorderedMatchedGPSNode reorderedMatchedGPSNode : reorderedMatchedGPSNodes) {
+		for (ReorderedMatchedGPSNode reorderedMatchedGPSNode : GPSNodes) {
 			matchedGPSNodes.add(reorderedMatchedGPSNode);
 		}
 

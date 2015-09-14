@@ -7,6 +7,7 @@ import graphic.JXMapPainter;
 import interfaces.JXMapMatchGUIInterface;
 import interfaces.MatchingGPSObject;
 import interfaces.StatusUpdate;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
@@ -22,20 +23,27 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import logging.Logger;
-import myOSM.myOSMMap;
+import myClasses.myDataset;
+import myClasses.myOSMMap;
+import myClasses.mySaveToFile;
+
 import org.jdesktop.swingx.JXMapKit;
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.painter.Painter;
+
 import algorithm.GPSToLinkMatcher;
 import algorithm.MatchGPStoNRouteAlgorithm;
 import algorithm.NRouteAlgorithm;
+import algorithm.ReorderedMatchedGPSNode;
 import route.SelectedNRoute;
 import dialogelements.JFileDialog;
 import static algorithm.NRouteAlgorithm.*;
@@ -737,7 +745,7 @@ public class JXMapMatchController implements ActionListener,
 				@Override
 				protected Boolean doInBackground() throws Exception {
 					try {
-						GPSTraceStreamer.saveMatchedGPSTraceToFile(myMap, matchingGPSObj.getMatchedGPSNodes(), matchingGPSObj.getRefTimeStamp(), jxMapMatchGUI.getNormalizeGPSTimeStamp(), gpsTraceFile.getAbsolutePath(), jxMapMatchGUI, matchGPStoNRouteAlgorithm.getMatchedNLinks(), kmlNorm, onlyUniqueMatchedGPS);
+						mySaveToFile.saveMatchedGPSTraceToFile(myMap, matchingGPSObj.getMatchedGPSNodes(), matchingGPSObj.getRefTimeStamp(), jxMapMatchGUI.getNormalizeGPSTimeStamp(), gpsTraceFile.getAbsolutePath(), jxMapMatchGUI, matchGPStoNRouteAlgorithm.getMatchedNLinks(), kmlNorm, onlyUniqueMatchedGPS);
 					} catch (Exception e) { 
 						e.printStackTrace();
 						return false;
@@ -764,140 +772,6 @@ public class JXMapMatchController implements ActionListener,
 		}
 		
 	}
-	
-	/*
-	private void openNRoute() {
-		// if user choose an valid file load N route file
-		if (jFileOpenNRoute.showOpenDialog()){
-			openNRoute(jFileOpenNRoute.getSelectedFile(), CLIENT_FILE_DIALOG);
-		}
-	}
-	*/
-	
-	/*
-	private void openNRoute(File nRouteFile, String client) {
-		openNRoute(nRouteFile, "", CLIENT_FILE_DIALOG);
-	}
-	*/
-
-	/*
-	private void openNRoute(final File nRouteFile, final String altMapFilePath, final String client) {
-		
-		// disable GUI
-		jxMapMatchGUI.enableGUI(false);
-		
-		// load N route file in background
-		SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>(){
-			@Override
-			protected Boolean doInBackground() {
-				// try to get map file info from N route file
-				try {
-					nRouteMapFilePath = NRouteStreamer.getMapFileFromNRouteFile(nRouteFile.getAbsolutePath(), altMapFilePath, jxMapMatchGUI);
-				} catch (NRouteFileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (MapFileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (NoSuchAlgorithmException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SHA256CheckSumException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				// loading process successful
-				return true;
-			}
-			
-			@Override
-			protected void done(){
-				try {
-					// check if loading was successful
-					if (get()) {
-						
-						System.out.println("N route map file: " + nRouteMapFilePath);
-						
-						// release GUI
-						jxMapMatchGUI.enableGUI(true);
-						
-						// N route file is valid, create virtual arguments for loading
-						// map file and N route data for creating selected N route
-						setArgs(nRouteMapFilePath,  nRouteFile.getAbsolutePath());
-						
-						// check if client was background loading process, notify via status update
-						if (client == CLIENT_FILE_DIALOG) finished(NROUTE_MAP_TO_LOAD);
-					}			
-				} catch (InterruptedException | ExecutionException e) { e.printStackTrace(); }
-			}
-			
-		};
-		
-		//do loading process in background
-		worker.execute();
-	}
-	*/
-	
-	/*
-	private void loadNRoute(final String nRouteFilePath, final String client) {
-		
-		// disable GUI
-		jxMapMatchGUI.enableGUI(false);
-		
-		// load N route file in background
-		SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>(){
-			@Override
-			protected Boolean doInBackground() {
-				
-				try {
-					selectedNRoute = NRouteStreamer.getNRouteFromFile(nRouteFilePath, myMap,  jxMapViewer, jxMapMatchGUI);
-				} catch (NRouteFileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			
-				// loading process successful
-				return true;
-			}
-			
-			@Override
-			protected void done(){
-				try {
-					// check if loading was successful
-					if (get()) {
-						
-						System.out.println("N route loaded! " + nRouteFilePath);
-						
-						// release GUI and activate N Route Algorithm mode again
-						jxMapMatchGUI.enableGUI(true);
-						jxMapMatchGUI.setNRouteAlgorithmMode(true);
-						
-						// Selected N Route already loaded so use this one
-						initSelectedNRoute(true);
-						
-						// set view and zoom
-						jxMapKit.setCenterPosition(selectedNRoute.getStartGeoPos());
-						jxMapKit.setZoom(1);
-						
-						// check if client was background loading process, notify via status update
-						if (client == CLIENT_FILE_DIALOG) finished(NROUTE_LOADED);
-					}			
-				} catch (InterruptedException | ExecutionException e) { e.printStackTrace(); }
-			}
-			
-		};
-		
-		//do loading process in background
-		worker.execute();
-	}
-	*/
 
 	private void saveNRoute() {
 		// if user choose an valid file
@@ -1006,24 +880,6 @@ public class JXMapMatchController implements ActionListener,
 		// initialize new Selected N Route (don't use old one)
 		initSelectedNRoute(false);
 	}
-	
-	/**
-	 * releases GPSToLinkMatcher reference
-	 * 
-	 * @return reference is not null and could be deleted
-	 */
-	/*
-	private boolean finalizeGPSToLinkMatcher(){
-		if (gpsToLinkMatcher != null) {
-			// set null
-			gpsToLinkMatcher = null;
-			// successfully released
-			return true;
-		}
-		// reference was already null
-		return false;
-	}
-	*/
 	
 	/**
 	 * initialize N route algorithm
@@ -1333,9 +1189,17 @@ public class JXMapMatchController implements ActionListener,
 					drawMatchedGPStoNRoute = true;
 					
 					// execute algorithm in background
+					// match GPS Nodes to OSM ROute
 					matchGPStoNRouteAlgorithm.executeMatchGPStoNRouteAlgorithm(jxMapMatchGUI.getReoderNMatch(),
 																			   jxMapMatchGUI.getProjectNMatch());
-						
+					
+					// reorder matched GPS node on OSM ROute
+					ReorderedMatchedGPSNode.reorderMatchedGPSNodes(matchGPStoNRouteAlgorithm.getMatchedNLinks(), matchGPStoNRouteAlgorithm.getMatchedGPSNodes());
+					
+					// match Datasets to OSM ROute
+					myDataset.matchMatchedGPSNode(myMap.DatasetsDown, true, matchGPStoNRouteAlgorithm.getMatchedGPSNodes(), matchGPStoNRouteAlgorithm.getMatchedNLinks(), myMap.CellInfos, jxMapMatchGUI.getUniqueGPS());
+					myDataset.matchMatchedGPSNode(myMap.DatasetsUp, false, matchGPStoNRouteAlgorithm.getMatchedGPSNodes(), matchGPStoNRouteAlgorithm.getMatchedNLinks(), myMap.CellInfos, jxMapMatchGUI.getUniqueGPS());
+
 				} catch (Exception e) { 
 					return false;
 				}
