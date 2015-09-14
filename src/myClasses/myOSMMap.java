@@ -79,7 +79,9 @@ public class myOSMMap {
 		CellInfos = myCellInfo.loadCellInfos(CellInfoFolderPath + "cellinfo.txt");
 	}
 	
-	
+	/*
+	 * initialization
+	 */
 	private void init() {
 		this.nodes = new HashMap<Long, myOSMNode>();
 		this.count_nodes = 0;
@@ -111,6 +113,9 @@ public class myOSMMap {
 		this.edges = new HashMap<Long, Map<Integer, myEdge>>();		
 	}
 	
+	/*
+	 * load osm file (_xmlFile) and netconvert file (netFilePath)
+	 */
 	public void loadMapFiles(File _xmlFile, String netFilePath) {
 
 		init();
@@ -165,59 +170,49 @@ public class myOSMMap {
 
 	}
 
+	/*
+	 * return dataset (upstream) nearest to Timestamp
+	 */
 	public myDataset getDatasetUp (long Timestamp) {
-		
 		for (int i = 0; i < DatasetsUp.size(); i++) {
-			
 			if (Timestamp <= DatasetsUp.get(i).getTimestamp()) {
 				return DatasetsUp.get(i);
 			}
-			
 		}
-		
 		return null;
 	}
 
+	/*
+	 * return dataset (downstream) nearest to Timestamp
+	 */
 	public myDataset getDatasetDown (long Timestamp) {
-		
 		for (int i = 0; i < DatasetsDown.size(); i++) {
-			
 			if (Timestamp <= DatasetsDown.get(i).getTimestamp()) {
 				return DatasetsDown.get(i);
 			}
-			
 		}
-		
 		return null;
 	}
 	
 	public int getNrOfAllWayParts() {
-		
 		int z = 0;
-		
 		for(int i = 0; i < ways.size(); i++) {
 				z = z + ways.get(i).WayParts.length;	
 		}
-		
 		return z;
 	}
 
 
 	public void removeUnusedNotesAndWaysAndSetWayParts() {
-
 		for(int i = (ways.size() - 1); i >= 0 ; i--) {
-			ways.get(i).setCountAndXYOfNotes();
+			ways.get(i).setXYOfNotes();
 		}
+	}
 
-	}
-	
-	public myOSMNode getNode(long nodeID) {
-		return nodes.get(nodeID);
-	}
 	
 	/**
 	 * Parses the XML file to a dynamic osmData Datastructure
-	 * @return
+	 * @return true if no error
 	 */
 	private boolean parseXML(boolean showOsmInfo){		
 		anzahl_ways = 0;
@@ -372,8 +367,6 @@ public class myOSMMap {
   	  	}
  
 	}
-
-
 
 	/**
 	 * Handles XML References
@@ -563,6 +556,9 @@ public class myOSMMap {
   	  	}  
 	}
 	
+	/*
+	 * return vector with all wayParts
+	 */
     public Vector<myOSMWayPart> getStreetLinksVector() {
     	// save street link inside this vector
     	Vector<myOSMWayPart> streetLinksVector = new Vector<myOSMWayPart>();
@@ -579,16 +575,6 @@ public class myOSMMap {
     	
     	// return converted street links as vector
     	return streetLinksVector;
-    }
-    
-    public myOSMWayPart getLink(int i){
-        if (i<0) i=0;
-        if (i<this.getNrOfAllWayParts()) return getStreetLinksVector().get(i);
-        return null;
-    }
-    
-    public myOSMWayPart getLink(long i){
-    	return getLink((int) i);
     }
 }
 

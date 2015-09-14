@@ -23,6 +23,7 @@ public class myOSMWay {
 	
 	public long id = -1;
 	
+	// nodes from ref-Tag from OXM XML file
 	public myOSMNode[] refs = null;
 	
 	public myOSMWayPart[] WayParts = new myOSMWayPart[0];
@@ -58,18 +59,14 @@ public class myOSMWay {
 	public Map<Long, Integer> IndexOfNodeId = new HashMap<Long, Integer>();
 	
 	public double length = -1;
-	
-	/*
-	machen:
-		1. length von Way
-		2. startWayLengthPos und endWayLengthPos von WayPart
-		3. startEdgeLength und endEdgeLength von WayPart
-	*/
-	
+
 	public myOSMWay(myOSMMap map) {
 		this.map = map;		
 	}
 	
+	/*
+	 * set and create WayParts from refs (ref-Tag from OSM XML)
+	 */
 	public void setWayParts() {
 
 		if (onyWay == false) {
@@ -157,9 +154,7 @@ public class myOSMWay {
 						WayPartsHin[a].WayPartBackDirektion = wp;
 						
 					}
-					
 				}
-				
 			}
 		}
 	
@@ -202,20 +197,11 @@ public class myOSMWay {
 		}
 	}
 	
-	public void setCountAndXYOfNotes() {
-		if (refs.length > 0) {
-			refs[0].countIsStartOfWay++;
-			
-			refs[refs.length - 1].countIsEndOfWay++;
-			
-			for (int i = 1; i < (refs.length - 1); i++) {
-				refs[i].countIsInnerNoteofWay++;				
-			}
-			
+	public void setXYOfNotes() {
+		if (refs.length > 0) {			
 			for (int i = 0; i < refs.length; i++) {
 				refs[i].setXY();
 			}
-
 		}
 	}
 	
@@ -236,6 +222,9 @@ public class myOSMWay {
 		return ((meansOfTransport & transportFlag) != 0);
 	}
 	
+	/**
+	 * return highwayType as int from highway
+	 */
 	public static int highwayType(String highway){
 		for (int i=0;i<highwayTypes.length;i++){
 			if (highwayTypes[i].equals(highway))

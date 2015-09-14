@@ -1554,13 +1554,7 @@ public class mySaveToFile {
 	}
 
 	private static void createCsvFromDatasets(myOSMMap myMap, Vector<MatchedNLink> matchedNLinks, String filePath) {
-		
-		//filePath = filePath.replace(".", "_DS.");
-		
 		try {
-			// wrap with buffered writer
-			//BufferedWriter bWriter_old = new BufferedWriter(new FileWriter(gpsTracefile_old));
-
 			File gpsTracefile = new File(filePath);
 			
 			BufferedWriter bWriter = new BufferedWriter(new FileWriter(gpsTracefile));

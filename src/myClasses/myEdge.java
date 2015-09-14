@@ -23,6 +23,12 @@ public class myEdge {
 	
 	public double length = -1;
 	
+	/**
+     * load the edges from file
+     * 
+     * @param FilePath: Path of the file
+     * @return Map of all edges from file 
+     */
 	public static Map<Integer, myEdge> loadGetEdges(String FilePath) {
 		
 		Map<Integer, myEdge> m = new HashMap<Integer, myEdge>();

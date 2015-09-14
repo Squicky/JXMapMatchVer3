@@ -17,7 +17,7 @@ public class myDataset {
 	@SuppressWarnings("unused")
 	private long timestampOrginal = 0;
     private long timestampInNanoSec = 0;
-	public int datarate = -1;
+    public int datarate = -1;
 	public double delay = -1;
 	public double loss_rate = -1;
 	public double lengthPos = -1;
@@ -30,24 +30,37 @@ public class myDataset {
 	public double Yunmatched = 0;
 	public boolean isMatched = false;
 	
-	public double lengthPosRouteDistributionUnmatched = -1;
-	public double lengthPosRouteDistributionMatched = -1;
-	public MatchedNLink matchedNLinkRouteDistribution = null;
-	public double matched_distribution_in_WayPart_RouteDistribution = -1;
-	public boolean isMatchedRouteDistribution = false;
+	private double lengthPosRouteDistributionUnmatched = -1;
+	private double lengthPosRouteDistributionMatched = -1;
+	private MatchedNLink matchedNLinkRouteDistribution = null;
+	private double matched_distribution_in_WayPart_RouteDistribution = -1;
 	public double X_RouteDistribution = 0;
 	public double Y_RouteDistribution = 0;
 	
-	public long objID = 0;
-	public static long objCount = 0;
+	@SuppressWarnings("unused")
+	private long objID = 0;
+	private static long objCount = 0;
 	
 	public myCellInfo cellInfo = null;
 	
+	/*
+	 * constructor
+	 */
 	public myDataset() {
 		objID = objCount;
 		objCount++;		
 	}
 	
+    /**
+     * match all myDataset of Datasets
+     * 
+     * @param Datasets: Vector of all myDataset
+     * @param isDatasetDown: info if datasets are from downstream
+     * @param gpsNodesToMatch: Vector of all matched gps nodes
+     * @param matchedNLinks: Vector of all matched wayParts (MatchedNLink)
+     * @param CellInfos: Vector of all myCellInfos
+     * @param onlyUniqueMatchedGPS: info if to use ""Unique GPS function"
+     */
 	public static void matchMatchedGPSNode(Vector<myDataset> Datasets, boolean isDatasetDown, Vector<MatchedGPSNode> gpsNodesToMatch,  Vector<MatchedNLink> matchedNLinks, Vector<myCellInfo> CellInfos, boolean onlyUniqueMatchedGPS) {
 		for (myDataset d : Datasets) {
 			d.match(gpsNodesToMatch, matchedNLinks, isDatasetDown, CellInfos, onlyUniqueMatchedGPS);
@@ -112,9 +125,7 @@ public class myDataset {
 					}
 				}
 				
-				if (Ds.matchedNLinkRouteDistribution == null) {
-					Ds.isMatchedRouteDistribution = false;
-				} else {
+				if (Ds.matchedNLinkRouteDistribution != null) {
 					double lengthPosInLink = Ds.lengthPosRouteDistributionMatched - Ds.matchedNLinkRouteDistribution.lengthPosStart;
 					
 					Ds.matched_distribution_in_WayPart_RouteDistribution = lengthPosInLink / Ds.matchedNLinkRouteDistribution.getStreetLink().length;
@@ -126,8 +137,6 @@ public class myDataset {
 					double yLen = Ds.matchedNLinkRouteDistribution.getStreetLink().endNode.y - Ds.matchedNLinkRouteDistribution.getStreetLink().startNode.y;
 					yLen = yLen * Ds.matched_distribution_in_WayPart_RouteDistribution;	
 					Ds.Y_RouteDistribution = Ds.matchedNLinkRouteDistribution.getStreetLink().startNode.y + yLen;
-
-					Ds.isMatchedRouteDistribution = true;
 				}
 
 			}
@@ -136,6 +145,15 @@ public class myDataset {
 
 	}
 	
+    /**
+     * match "this" to a wayPart of matchedNLinks
+     * 
+     * @param gpsNodesToMatch: Vector of all matched gps nodes
+     * @param matchedNLinks: Vector of all matched wayParts (MatchedNLink)
+     * @param isDatasetDown: info if datasets are from downstream
+     * @param CellInfos: Vector of all myCellInfos
+     * @param onlyUniqueMatchedGPS: info if to use ""Unique GPS function"
+     */
 	public void match(Vector<MatchedGPSNode> gpsNodesToMatch,  Vector<MatchedNLink> matchedNLinks, boolean isDatasetDown, Vector<myCellInfo> CellInfos, boolean onlyUniqueMatchedGPS) {
 		
 		for (int i = CellInfos.size() - 1; i >= 0 ; i--) {
@@ -296,6 +314,8 @@ public class myDataset {
 	}
 	
     /**
+     * set and save the timestamp in nanosec 
+     * 
      * @param timestamp
      */
     public void setTimestamp(long timestamp){
@@ -321,12 +341,20 @@ public class myDataset {
     }
 
     /**
+     * return the timestamp in nanosec
+     * 
      * @return (long) timestamp
      */
     public long getTimestamp(){
         return timestampInNanoSec;
     }
 	
+	/**
+     * load the datasets from "upstream-data.csv"
+     * 
+     * @param FilePath: Path of the file
+     * @return Vector of all datasets from file 
+     */
 	public static Vector<myDataset> loadDatasetsUp(String FilePath) {
 		
 		Vector<myDataset> datasets = new Vector<myDataset>();
@@ -386,6 +414,12 @@ public class myDataset {
 		
 	}
 	
+	/**
+     * load the datasets from "downstream-data.csv"
+     * 
+     * @param FilePath: Path of the file
+     * @return Vector of all datasets from file 
+     */
 	public static Vector<myDataset> loadDatasetsDown(String FilePath) {
 		
 		Vector<myDataset> datasets = new Vector<myDataset>();
@@ -442,6 +476,16 @@ public class myDataset {
 		
 	}
 	
+	/**
+     * load the datasets from "upstream-data.csv"
+     * 
+     * @param bReader: BufferedReader of of file
+     * @param columnNrDataRate: No of column of datarate in csv
+     * @param columnNrDelay: No of column of delay in csv
+     * @param columnNrTimestamp: No of column of timestamp in csv
+     * @param columnNrLossRate: No of column of loss_rate in csv
+     * @return Vector of all datasets from file 
+     */
 	private static Vector<myDataset> loadDatasets(BufferedReader bReader, int columnNrDataRate, int columnNrDelay, int columnNrTimestamp, int columnNrLossRate) {
 		
 		Vector<myDataset> datasets = new Vector<myDataset>();

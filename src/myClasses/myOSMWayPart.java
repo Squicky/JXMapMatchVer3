@@ -3,11 +3,9 @@ package myClasses;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Vector;
-
 import cartesian.Coordinates;
 import algorithm.MatchedRange;
 
-//import osm.StreetLink;
 
 public class myOSMWayPart {
 
@@ -27,14 +25,12 @@ public class myOSMWayPart {
 	public myOSMWay parentWay;
 	public int parentWayStepNr = -1;
 	public boolean isBackDirection = false;
-	// public StreetLink streetLink = null;
 
 	private Vector<MatchedRange> matchedRanges;
 
 	private int selectedCounter;
 
-	private boolean artificial = false; // is this link artificial (not part of
-										// parsed street map)
+	private boolean artificial = false; 
 
 	public final static long NO_ID = -1;
 
@@ -54,8 +50,7 @@ public class myOSMWayPart {
 
 	public int CountMatchedGPSNodes = 0;
 
-	public myOSMWayPart(myOSMNode n1, myOSMNode n2, long myid,
-			long startNodeId, long endNodeId) {
+	public myOSMWayPart(myOSMNode n1, myOSMNode n2, long myid, long startNodeId, long endNodeId) {
 		this(n1, n2, NO_ID, false, myid, startNodeId, endNodeId);
 	}
 
@@ -81,8 +76,7 @@ public class myOSMWayPart {
 		length = Coordinates.getDistance(startNode, endNode);
 	}
 
-	public myOSMWayPart(myOSMNode n1, myOSMNode n2, long id,
-			boolean artificial, long myid, long startNodeId, long endNodeId) {
+	public myOSMWayPart(myOSMNode n1, myOSMNode n2, long id, boolean artificial, long myid, long startNodeId, long endNodeId) {
 
 		this(n1, n2, null, -1, false);
 
@@ -97,20 +91,20 @@ public class myOSMWayPart {
 		selectedCounter = 0;
 	}
 
-	public myOSMWayPart(myOSMNode n1, myOSMNode n2, boolean artificial,
-			long myid, long startNodeId, long endNodeId) {
+	public myOSMWayPart(myOSMNode n1, myOSMNode n2, boolean artificial, long myid, long startNodeId, long endNodeId) {
 		this(n1, n2, NO_ID, artificial, myid, startNodeId, endNodeId);
 	}
 
 	public void setStartEndEdgeLength() {
 		if (this.edge != null) {
-			this.startEdgeLength = this.edge.length
-					* (this.startWayLengthPos / this.parentWay.length);
-			this.endEdgeLength = this.edge.length
-					* (this.endWayLengthPos / this.parentWay.length);
+			this.startEdgeLength = this.edge.length * (this.startWayLengthPos / this.parentWay.length);
+			this.endEdgeLength = this.edge.length * (this.endWayLengthPos / this.parentWay.length);
 		}
 	}
 
+	/**
+	 * search the edge to this wayPart and reference this edge
+	 */
 	public void setEdge() {
 
 		Map<Integer, myEdge> edges = this.parentWay.map.edges.get(this.parentWay.id);
@@ -133,60 +127,12 @@ public class myOSMWayPart {
 					this.edge = edge;
 				}
 
-				/*
-				 * 
-				 * if (this.isBackDirection == false) {
-				 * 
-				 * if (edge.reverse_direction == false) {
-				 * 
-				 * int startIndexOfWP =
-				 * this.parentWay.IndexOfNodeId.get(this.startNode.id); int
-				 * endIndexOfWP =
-				 * this.parentWay.IndexOfNodeId.get(this.endNode.id);
-				 * 
-				 * Integer startIndexOfE =
-				 * this.parentWay.IndexOfNodeId.get(edge.startNode); Integer
-				 * endIndexOfE = this.parentWay.IndexOfNodeId.get(edge.endNode);
-				 * 
-				 * if (startIndexOfE == null || endIndexOfE == null) {
-				 * startIndexOfE = 0; startIndexOfE = null; }
-				 * 
-				 * if (startIndexOfE <= startIndexOfWP && endIndexOfWP <=
-				 * endIndexOfE) {
-				 * 
-				 * if (this.edge == null) { this.edge = edges.get(i); } else {
-				 * System.out.println("Error: setEdge(): edge doppelt");
-				 * System.exit(-1); } } }
-				 * 
-				 * } else {
-				 * 
-				 * if (edges.get(i).reverse_direction == true ) {
-				 * 
-				 * int startIndexOfWP =
-				 * this.parentWay.IndexOfNodeId.get(this.startNode.id); int
-				 * endIndexOfWP =
-				 * this.parentWay.IndexOfNodeId.get(this.endNode.id);
-				 * 
-				 * int startIndexOfE =
-				 * this.parentWay.IndexOfNodeId.get(edges.get(i).startNode); int
-				 * endIndexOfE =
-				 * this.parentWay.IndexOfNodeId.get(edges.get(i).endNode);
-				 * 
-				 * if (startIndexOfE >= startIndexOfWP && endIndexOfWP >=
-				 * endIndexOfE) {
-				 * 
-				 * if (this.edge == null) { this.edge = edges.get(i); } else {
-				 * System.out.println("Error: setEdge(): edge doppelt");
-				 * System.exit(-1); } } } }
-				 */
-
 			}
 
 			if (this.edge == null) {
 				System.out.println("Error: setEdge(): no net-edge for "
 						+ this.parentWay.id + " : " + this.startNode.id
 						+ " -> " + this.endNode.id);
-				// System.exit(-1);
 			}
 		}
 
@@ -220,6 +166,11 @@ public class myOSMWayPart {
 		return this.ObjID;
 	}
 
+	/**
+	 * 
+	 * @param streetLink
+	 * @return (int) info if wayPart ist connectd to streetLink
+	 */
 	public int isConnectedTo(myOSMWayPart streetLink) {
 		// if link was given
 		if (streetLink != null) {
@@ -245,25 +196,6 @@ public class myOSMWayPart {
 
 		// no connection between street links
 		return NO_CONNECTION;
-	}
-
-	public int getStartNode(myOSMWayPart streetLink) {
-		int connectingNode = isConnectedTo(streetLink);
-
-		switch (connectingNode) {
-
-		case START_NODE:
-			// end node will be the starting node
-			// when we drive along this street
-			return END_NODE;
-
-		case END_NODE:
-			// start node will be...
-			return START_NODE;
-
-		default:
-			return connectingNode;
-		}
 	}
 
 	public void increaseSelectCounter() {
@@ -430,20 +362,6 @@ public class myOSMWayPart {
 		else
 			return -1;
 	}
-
-	/**
-	 * return size of last added matched range
-	 * 
-	 * @return
-	 */
-	/*
-	public int getLastMatchedRangeSize() {
-		if (!matchedRanges.isEmpty())
-			return matchedRanges.lastElement().getRangeSize();
-		else
-			return -1;
-	}
-	*/
 
 	/**
 	 * remove last added range if possible

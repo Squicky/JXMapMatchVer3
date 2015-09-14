@@ -11,6 +11,12 @@ import javax.swing.JOptionPane;
 import algorithm.MatchedGPSNode;
 import algorithm.MatchedNLink;
 
+/**
+ * @author Adrian Skuballa
+ *
+ *         This class represents the mobile cell of JXMapMatcher 
+ */
+
 public class myCellInfo {
 
 	@SuppressWarnings("unused")
@@ -23,73 +29,26 @@ public class myCellInfo {
 	public String g1_cellid = "-";
 	public String g1_lac = "-";
 
-	public double x_matched = 0;
-	public double y_machted = 0;
-
-	public double lengthPos = -1;
-	public double lengthPosInLink = -1;
-	public MatchedNLink matchedNLink = null;
-	public double matched_distribution_in_WayPart = -1;
-
 	public boolean isMatched = false;
-	
-    /*
-	public String w1_mcc = "";
-	public String w1_mnc = "";
-	public String w1_lac = "";
-	public String w1_ch = "";
-	public String w1_sc = "";
-	public String w1_rscp = "";
-	public String w1_ecno = "";
-	public String w1_rssi = "";
-	public String w1_servl = "";
-	public String w1_servq = "";
-	public String w1_hs = "";
-	public String w1_rs = "";
 
-	public String w2_mcc = "";
-	public String w2_mnc = "";
-	public String w2_lac = "";
-	public String w2_ch = "";
-	public String w2_sc = "";
-	public String w2_rscp = "";
-	public String w2_ecno = "";
-	public String w2_rssi = "";
-	public String w2_servl = "";
-	public String w2_servq = "";
-	public String w2_hs = "";
-	public String w2_rs = "";
-
-	public String w3_mcc = "";
-	public String w3_mnc = "";
-	public String w3_lac = "";
-	public String w3_ch = "";
-	public String w3_sc = "";
-	public String w3_rscp = "";
-	public String w3_ecno = "";
-	public String w3_rssi = "";
-	public String w3_servl = "";
-	public String w3_servq = "";
-	public String w3_hs = "";
-	public String w3_rs = "";
-	
-	public String m1_mmc = "";
-	public String m1_mnc = "";
-	public String m1_lac = "";
-	public String m1_cellid = "";
-	public String m1_bsic = "";
-	public String m1_ch = "";
-	public String m1_rxl = "";
-	public String m1_c1 = "";
-	public String m1_c2 = "";	
-	*/
-
+    /**
+     * 
+     * @param CellInfos: Vector of all myCellInfos
+     * @param matchedNLinks: Vector of all matched wayParts (MatchedNLink)
+     * @param gpsNodesToMatch: Vector of all matched gps nodes
+     */
 	public static void matchMatchedGPSNode(Vector<myCellInfo> CellInfos, Vector<MatchedNLink> matchedNLinks, Vector<MatchedGPSNode> gpsNodesToMatch) {		
 		for (myCellInfo ci : CellInfos) {
 			ci.match(gpsNodesToMatch, matchedNLinks);
 		}
 	}
 
+	/**
+     * match "this" to a wayPart of matchedNLinks
+     * 
+     * @param matchedNLinks: Vector of all matched wayParts (MatchedNLink)
+     * @param gpsNodesToMatch: Vector of all matched gps nodes
+     */
 	private void match(Vector<MatchedGPSNode> gpsNodesToMatch, Vector<MatchedNLink> matchedNLinks) {
 		MatchedGPSNode lastNode = null;
 		for (int i = gpsNodesToMatch.size()-1; i >= 0; i--) {
@@ -134,43 +93,35 @@ public class myCellInfo {
 			lenPosTotal -= lastNode.lengthPos;
 		}
 
-		this.lengthPos = lenPosTotal * timeDistribution;
+		double lengthPos = -1;
+		lengthPos = lenPosTotal * timeDistribution;
 
 		if (lastNode.isReordered) {
-			this.lengthPos += lastNode.lengthPosReordered;
+			lengthPos += lastNode.lengthPosReordered;
 		} else {
-			this.lengthPos += lastNode.lengthPos;
+			lengthPos += lastNode.lengthPos;
 		}
 
+		MatchedNLink matchedNLink = null;
 		for (MatchedNLink link : matchedNLinks) {
-			if (link.lengthPosStart <= this.lengthPos && this.lengthPos <= link.lengthPosEnd) {
-				this.matchedNLink = link;
+			if (link.lengthPosStart <= lengthPos && lengthPos <= link.lengthPosEnd) {
+				matchedNLink = link;
 				link.matchedCellInfos.add(this);
 				break;
 			}
 		}
 
-		if (this.matchedNLink == null) {
+		if (matchedNLink == null) {
 			isMatched = false;
 			return;
 		}
-
-		this.lengthPosInLink = this.lengthPos - this.matchedNLink.lengthPosStart;
-
-		this.matched_distribution_in_WayPart = lengthPosInLink / this.matchedNLink.getStreetLink().length;
-
-		// set X Y matched
-		double xLen = this.matchedNLink.getStreetLink().endNode.x - this.matchedNLink.getStreetLink().startNode.x;
-		xLen = xLen * this.matched_distribution_in_WayPart;	
-		this.x_matched = this.matchedNLink.getStreetLink().startNode.x + xLen;
-		double yLen = this.matchedNLink.getStreetLink().endNode.y - this.matchedNLink.getStreetLink().startNode.y;
-		yLen = yLen * this.matched_distribution_in_WayPart;	
-		this.y_machted = this.matchedNLink.getStreetLink().startNode.y + yLen;
 
 		isMatched = true;
 	}
 	
     /**
+     * set and save the timestamp in nanosec 
+     * 
      * @param timestamp
      */
     public void setTimestamp(long timestamp){
@@ -196,17 +147,23 @@ public class myCellInfo {
     }
 
     /**
+     * return the timestamp in nanosec
+     * 
      * @return (long) timestamp
      */
     public long getTimestamp(){
         return timestampInNanoSec;
     }
 	
+	/**
+     * load the Modemdaten from "cellinfo.txt"
+     * 
+     * @param FilePath: Path of the file "cellinfo.txt"
+     * @return Vector of all Modemdaten from file "cellinfo.txt"
+     */
 	public static Vector<myCellInfo> loadCellInfos(String FilePath) {
 		
 		Vector<myCellInfo> v = new Vector<myCellInfo>();
-		
-		//int x = 0;
 		
 		String line = "";
 		try {
@@ -307,9 +264,7 @@ public class myCellInfo {
 			System.out.println("Error: loadCellInfos: \n" + line + "\n" + e.toString());
 		}
 		
-		
 		return v;
-		
 	}
 	
 }

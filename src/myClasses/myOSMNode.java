@@ -14,12 +14,6 @@ public class myOSMNode {
 	public double x = -1;
 	public double y = -1;
 	
-	public int countIsStartOfWay = 0;
-	
-	public int countIsEndOfWay = 0;
-	
-	public int countIsInnerNoteofWay = 0;
-	
 	private Vector<myOSMWayPart> WayPartsOutgoing = new Vector<myOSMWayPart>(2, 2);
 
 	private Vector<myOSMWayPart> WayPartsIncoming = new Vector<myOSMWayPart>(2, 2);
@@ -63,6 +57,9 @@ public class myOSMNode {
 		 return this.WayPartsIncoming.contains(wp);
 	}
 
+	/*
+	 * return all outgoing wayParts, but ignore excludedNode as target
+	 */
     public Vector<myOSMWayPart> getOutgoingWayPartExceptNotTo(myOSMNode excludedNode) {
     	// container for street links
     	Vector<myOSMWayPart> linkContainer = new Vector<>(this.WayPartsOutgoing.size());
@@ -78,6 +75,9 @@ public class myOSMNode {
     	return linkContainer;
     }
 
+	/*
+	 * return all incoming wayParts, but ignore excludedNode as origin
+	 */
     public Vector<myOSMWayPart> getIncomingWayPartExceptNotFrom(myOSMNode excludedNode) {
     	// container for street links
     	Vector<myOSMWayPart> linkContainer = new Vector<>(this.WayPartsIncoming.size());
@@ -93,21 +93,9 @@ public class myOSMNode {
     	return linkContainer;
     }
 
-    public Vector<myOSMWayPart> getIncomingWayPartExceptNotTo(myOSMNode excludedNode) {
-    	// container for street links
-    	Vector<myOSMWayPart> linkContainer = new Vector<>(this.WayPartsIncoming.size());
-    	
-    	// add all outgoing links except given one
-    	for (myOSMWayPart link : this.WayPartsIncoming) {
-    		if (link.endNode != excludedNode) {
-    			linkContainer.add(link);
-    		}
-    	}
-    	
-    	// return extracted outgoing links
-    	return linkContainer;
-    }
-	
+	/*
+	 * return all incoming wayParts, but ignore excludedLink
+	 */
     public Vector<myOSMWayPart> getOutgoingWayPartExcept(myOSMWayPart excludedLink) {
     	// container for street links
     	Vector<myOSMWayPart> linkContainer = new Vector<>(this.WayPartsOutgoing.size());
@@ -123,25 +111,26 @@ public class myOSMNode {
     	return linkContainer;
     }
     
-    
+    /*
+     * return all outgoing wayParts
+     */
     public Vector<myOSMWayPart> getLinks(){
     	//return all links belongs to this node
     	return this.WayPartsOutgoing;
     }
     
-    
+    /*
+     * add outgoing wayPart
+     */
     public void addLink(myOSMWayPart link){
-    	
     	this.WayPartsOutgoing.add(link);
-    	
-    	System.out.println("Error: myOSMNode: addLink(myOSMWayPart link)");
-    	
     }
     
+    /*
+     * remove outgoing wayPart
+     */
     public void removeLink(myOSMWayPart streetLink) {
-    	
     	WayPartsOutgoing.remove(streetLink);
-    	
     	System.out.println("Error: myOSMNode: removeLink(myOSMWayPart link)");
     }
 }

@@ -10,6 +10,7 @@ import cartesian.Coordinates;
 
 /**
  * @author Daniel Sathees Elmo
+ * @author Adrian Skuballa
  * 
  * this class represents an route which an user can build by
  * clicking several links
@@ -118,15 +119,6 @@ public class SelectedRoute {
 	private void addAllStreetLinksToPool() {
 		// get all street links of map as vector
 		selectableStreetLinksPool = myMap.getStreetLinksVector();
-		
-		/*
-		// clear pool, all links are now choosable
-		selectableStreetLinksPool.clear();
-
-		// convert street links array to vector and resize it to real size
-		Collections.addAll(selectableStreetLinksPool, streetMap.getLinks());
-		selectableStreetLinksPool.setSize(streetMap.getNrOfLinks());
-		*/
 	}
 	
 	/**
